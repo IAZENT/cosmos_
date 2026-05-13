@@ -1,0 +1,86 @@
+name: Sync intel feeds
+
+# Runs the COSMOS sync endpoints on a schedule via GitHub-hosted cron.
+# This complements (and can fully replace) the Vercel cron job, which on
+# the Hobby plan is limited to one invocation per day.
+#
+# Required repo secrets:
+#   APP_URL       e.g. https://cosmos.example.com   (no trailing slash)
+#   CRON_SECRET   same value as the CRON_SECRET env var on Vercel
+#
+# To add them: GitHub repo → Settings → Secrets and variables → Actions
+# → New repository secret.
+
+on:
+  # Every 2 hours, on the hour (UTC). Tweak freely  GitHub Actions
+  # imposes no schedule frequency limit on public repos and a fairly
+  # generous one on private (5-min minimum granularity).
+  schedule:
+    - cron: '0 */2 * * *'
+  # Manual trigger from the Actions tab.
+  workflow_dispatch:
+
+# Avoid two scheduled runs piling up on each other if a job runs long.
+concurrency:
+  group: sync-intel
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  cve:
+    name: Sync NVD CVEs
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Hit /api/sync/cve
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${APP_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::APP_URL or CRON_SECRET secret is not set."
+            exit 1
+          fi
+          # --fail makes curl exit non-zero on HTTP >= 400 so the job
+          # turns red. -sS keeps it quiet on success but loud on errors.
+          # We POST  GET also works (Vercel uses GET) but POST is the
+          # documented manual-trigger contract.
+          curl --fail --show-error --silent --location \
+            --max-time 240 \
+            --retry 2 --retry-delay 10 --retry-connrefused \
+            -X POST \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "User-Agent: cosmos-sync-bot/1.0 (+github-actions)" \
+            "${APP_URL}/api/sync/cve" \
+            | tee /tmp/cve.json
+          jq -e '.ok // (has("inserted") or has("upserted") or has("count"))' /tmp/cve.json \
+            > /dev/null || {
+              echo "::warning::Sync responded but payload shape was unexpected. See log."
+            }
+
+  kev:
+    name: Sync CISA KEV
+    runs-on: ubuntu-latest
+    needs: cve  # run KEV after CVE so they don't fight for DB connections
+    timeout-minutes: 5
+    steps:
+      - name: Hit /api/sync/kev
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${APP_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::APP_URL or CRON_SECRET secret is not set."
+            exit 1
+          fi
+          curl --fail --show-error --silent --location \
+            --max-time 240 \
+            --retry 2 --retry-delay 10 --retry-connrefused \
+            -X POST \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "User-Agent: cosmos-sync-bot/1.0 (+github-actions)" \
+            "${APP_URL}/api/sync/kev"

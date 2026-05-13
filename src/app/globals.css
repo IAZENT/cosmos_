@@ -164,6 +164,32 @@ select {
   font-family: var(--font-geist-mono), Courier New, monospace !important;
   font-size: 13px !important;
 }
+/* Force the textarea text to actually render. The MD editor overlays a
+ * transparent textarea on a highlighted <pre>; on dark themes some
+ * builds default to `-webkit-text-fill-color: transparent`, which made
+ * keystrokes invisible. */
+.cosmos-md-editor .w-md-editor-text-input,
+.cosmos-md-editor textarea.w-md-editor-text-input {
+  -webkit-text-fill-color: var(--cosmos-text) !important;
+  color: var(--cosmos-text) !important;
+  caret-color: var(--cosmos-accent) !important;
+  /* Hide the highlighted <pre> so the textarea is the only visible layer.
+   * Trade-off: in-place syntax highlighting is dropped, but text is
+   * always legible. The live preview pane keeps full highlighting. */
+}
+.cosmos-md-editor .w-md-editor-text-pre > .code-line,
+.cosmos-md-editor .w-md-editor-text-pre code {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+}
+.cosmos-md-editor .w-md-editor-text-input::selection {
+  background: var(--cosmos-accent-dim) !important;
+  color: var(--cosmos-text) !important;
+}
+.cosmos-md-editor .w-md-editor-text-input::placeholder {
+  color: var(--cosmos-text-dim) !important;
+  -webkit-text-fill-color: var(--cosmos-text-dim) !important;
+}
 .cosmos-md-editor .w-md-editor-preview {
   background: var(--cosmos-bg) !important;
   border-left: 1px solid var(--cosmos-border-dim) !important;

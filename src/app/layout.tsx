@@ -6,14 +6,14 @@ import './globals.css'
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'http://localhost:3000'),
   title: {
-    default: 'COSMOS  Cybersecurity Intelligence Platform',
+    default: 'COSMOS',
     template: '%s | COSMOS',
   },
   description:
     'Cybersecurity intelligence, research, and operational infrastructure.',
   robots: { index: true, follow: true },
   openGraph: {
-    title: 'COSMOS  Cybersecurity Intelligence Platform',
+    title: 'COSMOS',
     description:
       'Cybersecurity intelligence, research, and operational infrastructure.',
     type: 'website',

@@ -88,6 +88,28 @@ export async function GET(request: Request) {
 
     const { data, error, count } = await q
     if (error) {
+      // Migration not yet applied  the table doesn't exist. Return an
+      // empty feed with `configured: false` so the UI can render an
+      // informative empty state instead of a scary error toast.
+      const looksLikeMissingTable =
+        /scholarship_news/.test(error.message) &&
+        /(does not exist|could not find|schema cache)/i.test(error.message)
+      if (looksLikeMissingTable) {
+        return NextResponse.json(
+          {
+            items: [],
+            total: 0,
+            limit,
+            offset,
+            configured: false,
+          } satisfies ScholarshipFeedResponse,
+          {
+            headers: {
+              'cache-control': 's-maxage=60, stale-while-revalidate=300',
+            },
+          },
+        )
+      }
       return NextResponse.json(
         { error: `db: ${error.message}` },
         { status: 500 },

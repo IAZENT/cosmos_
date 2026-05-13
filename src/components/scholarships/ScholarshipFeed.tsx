@@ -114,8 +114,8 @@ export function ScholarshipFeed() {
 
       {!configured ? (
         <EmptyState
-          title="Scholarships are not configured."
-          description="Supabase isn't connected, so we can't show aggregated postings yet."
+          title="Scholarship feed is being set up."
+          description="The data source isn't ready yet  the first sync will populate this page within a few minutes. Check back shortly."
         />
       ) : null}
 

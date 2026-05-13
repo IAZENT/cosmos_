@@ -2,7 +2,6 @@ import Link from 'next/link'
 import {
   BookOpen,
   Network,
-  Server,
   Shield,
   Wrench,
   type LucideIcon,
@@ -15,7 +14,6 @@ interface ModuleDef {
   href: string
   Icon: LucideIcon
   blurb: string
-  locked?: boolean
 }
 
 const MODULES: ModuleDef[] = [
@@ -51,15 +49,6 @@ const MODULES: ModuleDef[] = [
     blurb:
       'Client-side utilities: hash analyser, JWT inspector, CVSS calculator, decoders.',
   },
-  {
-    num: '05',
-    title: 'Infrastructure',
-    href: '/user2admin',
-    Icon: Server,
-    blurb:
-      'Operational surface: sync controls, content pipelines, platform telemetry.',
-    locked: true,
-  },
 ]
 
 export function ModuleGrid() {
@@ -84,11 +73,6 @@ export function ModuleGrid() {
                 <span className="font-mono text-[12px] text-[var(--cosmos-text-muted)]">
                   ({m.num})
                 </span>
-                {m.locked ? (
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-dim)]">
-                    admin
-                  </span>
-                ) : null}
               </div>
               <h3 className="text-[20px] text-[var(--cosmos-text)]">
                 {m.title}

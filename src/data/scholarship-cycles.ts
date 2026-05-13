@@ -1,0 +1,488 @@
+import type { ScholarshipCycle } from '@/types/scholarship-cycle'
+
+/**
+ * Curated annual cycles for 30+ major scholarships, hand-checked against
+ * each programme's official page. Update once a year (or when a
+ * programme announces a new cycle), and bump `verifiedYear` so the UI
+ * can flag stale entries.
+ *
+ * Date strategy: we use the *typical* mid-window day for the given month
+ * because most programmes publish exact dates only a few weeks ahead.
+ * Students should always confirm the official page  the UI never
+ * claims authority over the source.
+ *
+ * Sort order in this file is loose; the UI sorts by urgency at runtime.
+ * Grouping by country helps reviewers spot duplicates / gaps.
+ */
+export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
+  /* ============================== Germany ============================ */
+  {
+    slug: 'daad-study-scholarship',
+    name: 'DAAD Study Scholarship (Master)',
+    country: 'Germany',
+    levels: ['Master'],
+    funding: 'FULL',
+    typicalOpen: { month: 8, day: 15 },
+    typicalClose: { month: 11, day: 15 },
+    officialUrl:
+      'https://www.daad.de/en/study-and-research-in-germany/scholarships/daad-funding/',
+    description:
+      'Monthly stipend, health insurance, and travel allowance for graduates pursuing a Master\u2019s in Germany.',
+    value: '€934/month + benefits',
+    notes:
+      'Cycle dates vary by your country office. Check your regional DAAD page (daad.<country-tld>) for the exact deadline.',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'daad-research-grant',
+    name: 'DAAD Research Grant (PhD)',
+    country: 'Germany',
+    levels: ['PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 8, day: 1 },
+    typicalClose: { month: 11, day: 30 },
+    officialUrl:
+      'https://www.daad.de/en/study-and-research-in-germany/scholarships/daad-funding/',
+    description:
+      'Doctoral funding for international students completing or starting a PhD at a German university.',
+    value: '€1,300/month + benefits',
+    notes: 'Multiple sub-programmes (Short-Term, One-Year, Bi-nationally Supervised); all share roughly this window.',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'daad-wise',
+    name: 'DAAD WISE (Bachelor summer research)',
+    country: 'Germany',
+    levels: ['Bachelor'],
+    funding: 'FULL',
+    typicalOpen: { month: 9, day: 1 },
+    typicalClose: { month: 12, day: 15 },
+    officialUrl:
+      'https://www.daad.de/en/studying-in-germany/scholarships/daad-funding-programmes/wise/',
+    description:
+      'Working Internships in Science and Engineering: 2-3 month summer research placements at German universities for STEM undergraduates.',
+    value: '€934/month',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'heinrich-boll-foundation',
+    name: 'Heinrich Böll Foundation Scholarship',
+    country: 'Germany',
+    levels: ['Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 1, day: 15 },
+    typicalClose: { month: 3, day: 1 },
+    officialUrl: 'https://www.boell.de/en/scholarships',
+    description:
+      'Stipend for international students with strong academic and civic engagement, hosted by the Green-aligned political foundation.',
+    value: '€934/month + research allowance',
+    notes: 'Two cycles per year: March 1 (winter intake) and September 1 (summer intake).',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'konrad-adenauer-stiftung',
+    name: 'Konrad-Adenauer-Stiftung Scholarship',
+    country: 'Germany',
+    levels: ['Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 5, day: 1 },
+    typicalClose: { month: 7, day: 15 },
+    officialUrl: 'https://www.kas.de/en/scholarships',
+    description:
+      'Funding for foreign students aligned with the foundation\u2019s political-education mission.',
+    value: '€934/month + benefits',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'humboldt-research-fellowship',
+    name: 'Humboldt Research Fellowship (Postdoc)',
+    country: 'Germany',
+    levels: ['Postdoc'],
+    funding: 'FULL',
+    typicalOpen: { month: 1, day: 1 },
+    typicalClose: { month: 12, day: 31 },
+    officialUrl:
+      'https://www.humboldt-foundation.de/en/apply/sponsorship-programmes/humboldt-research-fellowship',
+    description:
+      'Up to 24 months of postdoctoral research at any German institution, for top postdocs in any discipline.',
+    value: '€2,670/month + benefits',
+    notes: 'Rolling deadline  applications reviewed three times per year.',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'erasmus-mundus-joint-masters',
+    name: 'Erasmus Mundus Joint Master\u2019s',
+    country: 'EU',
+    levels: ['Master'],
+    funding: 'FULL',
+    typicalOpen: { month: 10, day: 1 },
+    typicalClose: { month: 1, day: 31 },
+    officialUrl:
+      'https://erasmus-plus.ec.europa.eu/opportunities/individuals/students/erasmus-mundus-joint-masters',
+    description:
+      'Two-year Master\u2019s split across 2-4 European universities, with full tuition and a generous monthly stipend.',
+    value: '€1,400/month + tuition + travel',
+    notes: 'Each programme runs its own application window; this is the typical aggregate range.',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'msca-postdoctoral-fellowship',
+    name: 'Marie Sk\u0142odowska-Curie Postdoctoral Fellowship',
+    country: 'EU',
+    levels: ['Postdoc'],
+    funding: 'FULL',
+    typicalOpen: { month: 4, day: 15 },
+    typicalClose: { month: 9, day: 11 },
+    officialUrl:
+      'https://marie-sklodowska-curie-actions.ec.europa.eu/actions/postdoctoral-fellowships',
+    description:
+      'Two-year postdoc grants for researchers of any nationality moving to a European host institution.',
+    value: '€5,990/month + mobility + family allowance',
+    verifiedYear: 2025,
+  },
+
+  /* ================================ UK =============================== */
+  {
+    slug: 'chevening',
+    name: 'Chevening Scholarship',
+    country: 'UK',
+    levels: ['Master'],
+    funding: 'FULL',
+    typicalOpen: { month: 8, day: 1 },
+    typicalClose: { month: 11, day: 7 },
+    officialUrl: 'https://www.chevening.org/scholarship/',
+    description:
+      'Fully-funded one-year Master\u2019s at any UK university for emerging leaders, sponsored by the UK Foreign Office.',
+    value: 'Tuition + £1,300/month + travel',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'commonwealth-scholarship',
+    name: 'Commonwealth Scholarship',
+    country: 'UK',
+    levels: ['Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 8, day: 15 },
+    typicalClose: { month: 10, day: 18 },
+    officialUrl: 'https://cscuk.fcdo.gov.uk/scholarships/',
+    description:
+      'Master\u2019s and PhD funding for citizens of low- and middle-income Commonwealth countries.',
+    value: 'Tuition + monthly stipend + travel',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'gates-cambridge',
+    name: 'Gates Cambridge Scholarship',
+    country: 'UK',
+    levels: ['Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 9, day: 1 },
+    typicalClose: { month: 12, day: 4 },
+    officialUrl: 'https://www.gatescambridge.org/apply/',
+    description:
+      'Full-cost scholarship for outstanding international students to pursue a postgraduate degree at Cambridge.',
+    value: 'Full tuition + £21,000/year + benefits',
+    notes: 'US citizens have a slightly earlier deadline (mid-October).',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'rhodes-scholarship',
+    name: 'Rhodes Scholarship',
+    country: 'UK',
+    levels: ['Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 6, day: 1 },
+    typicalClose: { month: 9, day: 30 },
+    officialUrl: 'https://www.rhodeshouse.ox.ac.uk/scholarships/',
+    description:
+      'Postgraduate funding at Oxford for exceptional students from select countries  one of the oldest international scholarships.',
+    value: 'Full tuition + £18,180/year stipend',
+    notes: 'Each constituency has its own deadline; consult your country page for the exact date.',
+    verifiedYear: 2025,
+  },
+
+  /* ================================ USA ============================== */
+  {
+    slug: 'fulbright-foreign-student',
+    name: 'Fulbright Foreign Student Program',
+    country: 'USA',
+    levels: ['Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 2, day: 1 },
+    typicalClose: { month: 5, day: 31 },
+    officialUrl: 'https://foreign.fulbrightonline.org/',
+    description:
+      'US government-funded Master\u2019s and PhD programmes for international students at any accredited US university.',
+    value: 'Tuition + monthly stipend + health + travel',
+    notes: 'Deadlines vary by country: US embassies / Fulbright Commissions run local cycles  check your country\u2019s page.',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'humphrey-fellowship',
+    name: 'Hubert H. Humphrey Fellowship',
+    country: 'USA',
+    levels: ['Short-term'],
+    funding: 'FULL',
+    typicalOpen: { month: 5, day: 1 },
+    typicalClose: { month: 9, day: 15 },
+    officialUrl: 'https://www.humphreyfellowship.org/',
+    description:
+      'One-year non-degree fellowship for mid-career professionals from emerging-market countries to study at a US university.',
+    value: 'Tuition + monthly stipend + travel + health',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'knight-hennessy',
+    name: 'Knight-Hennessy Scholars (Stanford)',
+    country: 'USA',
+    levels: ['Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 6, day: 1 },
+    typicalClose: { month: 10, day: 9 },
+    officialUrl: 'https://knight-hennessy.stanford.edu/',
+    description:
+      'Full funding for any graduate programme at Stanford, plus a leadership development cohort.',
+    value: 'Full tuition + stipend + travel',
+    verifiedYear: 2025,
+  },
+
+  /* =============================== Asia ============================== */
+  {
+    slug: 'mext',
+    name: 'MEXT (Japanese Government Scholarship)',
+    country: 'Japan',
+    levels: ['Bachelor', 'Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 4, day: 1 },
+    typicalClose: { month: 6, day: 15 },
+    officialUrl:
+      'https://www.studyinjapan.go.jp/en/planning/scholarship/japanese-government/',
+    description:
+      'Tuition-free study at any Japanese university with monthly living stipend, run by the Ministry of Education.',
+    value: 'Tuition + ¥117,000-145,000/month + travel',
+    notes: 'Two routes: Embassy Recommendation (apply via your country\u2019s Japanese embassy) and University Recommendation.',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'kgsp-graduate',
+    name: 'Global Korea Scholarship (Graduate)',
+    country: 'South Korea',
+    levels: ['Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 2, day: 1 },
+    typicalClose: { month: 3, day: 31 },
+    officialUrl: 'https://www.studyinkorea.go.kr/',
+    description:
+      'Korean government scholarship for graduate study at participating Korean universities, formerly KGSP.',
+    value: 'Tuition + ₩1,000,000/month + Korean language training',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'kgsp-undergraduate',
+    name: 'Global Korea Scholarship (Undergraduate)',
+    country: 'South Korea',
+    levels: ['Bachelor'],
+    funding: 'FULL',
+    typicalOpen: { month: 9, day: 1 },
+    typicalClose: { month: 10, day: 31 },
+    officialUrl: 'https://www.studyinkorea.go.kr/',
+    description:
+      'Full undergraduate funding plus a year of Korean-language preparation at a designated training institution.',
+    value: 'Tuition + ₩900,000/month + language training',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'csc-china',
+    name: 'Chinese Government Scholarship (CSC)',
+    country: 'China',
+    levels: ['Bachelor', 'Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 1, day: 1 },
+    typicalClose: { month: 4, day: 15 },
+    officialUrl: 'https://www.campuschina.org/',
+    description:
+      'Full or partial scholarships at 280+ Chinese universities, administered by the China Scholarship Council.',
+    value: 'Tuition + monthly stipend (varies by level)',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'singapore-sgs',
+    name: 'Singapore International Graduate Award (SINGA)',
+    country: 'Singapore',
+    levels: ['PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 6, day: 1 },
+    typicalClose: { month: 7, day: 31 },
+    officialUrl: 'https://www.a-star.edu.sg/Scholarships/for-graduate-studies/singapore-international-graduate-award-singa',
+    description:
+      'Four-year PhD scholarship at NUS, NTU, SUTD, or A*STAR research institutes for international students.',
+    value: 'Tuition + S$2,200-2,700/month',
+    notes: 'Two intakes per year (Jan / Jul); window above is the summer intake.',
+    verifiedYear: 2025,
+  },
+
+  /* =========================== Australia / NZ ======================== */
+  {
+    slug: 'australia-awards',
+    name: 'Australia Awards Scholarship',
+    country: 'Australia',
+    levels: ['Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 2, day: 1 },
+    typicalClose: { month: 4, day: 30 },
+    officialUrl: 'https://www.dfat.gov.au/people-to-people/australia-awards/scholarships',
+    description:
+      'Long-term development scholarships for postgraduate study at participating Australian universities.',
+    value: 'Tuition + AU$30,000/year stipend + travel',
+    notes: 'Eligibility is country-restricted; check the country page for exact deadlines.',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'nz-manaaki',
+    name: 'Manaaki New Zealand Scholarship',
+    country: 'New Zealand',
+    levels: ['Master', 'PhD', 'Short-term'],
+    funding: 'FULL',
+    typicalOpen: { month: 2, day: 1 },
+    typicalClose: { month: 3, day: 28 },
+    officialUrl: 'https://www.nzscholarships.govt.nz/',
+    description:
+      'New Zealand government scholarship for citizens of selected developing countries.',
+    value: 'Tuition + monthly stipend + travel',
+    verifiedYear: 2025,
+  },
+
+  /* ============================= Canada ============================== */
+  {
+    slug: 'vanier',
+    name: 'Vanier Canada Graduate Scholarship',
+    country: 'Canada',
+    levels: ['PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 6, day: 1 },
+    typicalClose: { month: 11, day: 1 },
+    officialUrl: 'https://vanier.gc.ca/',
+    description:
+      'Three-year doctoral funding for top international and Canadian PhD students.',
+    value: 'CA$50,000/year for 3 years',
+    notes: 'You apply via the Canadian university you\u2019re joining; check that institution\u2019s internal deadline.',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'banting-postdoc',
+    name: 'Banting Postdoctoral Fellowship',
+    country: 'Canada',
+    levels: ['Postdoc'],
+    funding: 'FULL',
+    typicalOpen: { month: 7, day: 1 },
+    typicalClose: { month: 9, day: 15 },
+    officialUrl: 'https://banting.fellowships-bourses.gc.ca/',
+    description:
+      'Two-year postdoctoral fellowship, jointly run by Canada\u2019s three federal research councils.',
+    value: 'CA$70,000/year',
+    verifiedYear: 2025,
+  },
+
+  /* ============================== Europe ============================= */
+  {
+    slug: 'eiffel',
+    name: 'Eiffel Excellence Scholarship (France)',
+    country: 'France',
+    levels: ['Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 10, day: 15 },
+    typicalClose: { month: 1, day: 10 },
+    officialUrl: 'https://www.campusfrance.org/en/eiffel-scholarship-program-of-excellence',
+    description:
+      'French government scholarship to attract top foreign students to French Master\u2019s and PhD programmes.',
+    value: '€1,181-1,700/month + travel + benefits',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'swiss-government-excellence',
+    name: 'Swiss Government Excellence Scholarship',
+    country: 'Switzerland',
+    levels: ['Master', 'PhD', 'Postdoc'],
+    funding: 'FULL',
+    typicalOpen: { month: 8, day: 1 },
+    typicalClose: { month: 12, day: 15 },
+    officialUrl: 'https://www.sbfi.admin.ch/sbfi/en/home/education/scholarships-and-grants/swiss-government-excellence-scholarships.html',
+    description:
+      'Postgraduate research grant at any Swiss public university or research institute.',
+    value: 'CHF 1,920-3,500/month + tuition waiver',
+    notes: 'Window varies by country of origin; check the embassy in your country for the exact deadline.',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'stipendium-hungaricum',
+    name: 'Stipendium Hungaricum',
+    country: 'Hungary',
+    levels: ['Bachelor', 'Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 11, day: 15 },
+    typicalClose: { month: 1, day: 15 },
+    officialUrl: 'https://stipendiumhungaricum.hu/',
+    description:
+      'Hungarian government scholarship covering tuition and a monthly contribution at any participating Hungarian university.',
+    value: 'Tuition + HUF 43,700-140,000/month + housing',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'turkiye-burslari',
+    name: 'Türkiye Bursları',
+    country: 'Turkey',
+    levels: ['Bachelor', 'Master', 'PhD'],
+    funding: 'FULL',
+    typicalOpen: { month: 1, day: 10 },
+    typicalClose: { month: 2, day: 20 },
+    officialUrl: 'https://www.turkiyeburslari.gov.tr/',
+    description:
+      'Comprehensive scholarship covering tuition, accommodation, monthly stipend, and Turkish-language training.',
+    value: 'Tuition + ₺3,500-5,000/month + housing',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'orange-tulip',
+    name: 'Orange Tulip Scholarship (Netherlands)',
+    country: 'Netherlands',
+    levels: ['Master'],
+    funding: 'PARTIAL',
+    typicalOpen: { month: 11, day: 1 },
+    typicalClose: { month: 4, day: 1 },
+    officialUrl: 'https://www.studyinnl.org/finances/orange-tulip-scholarship',
+    description:
+      'Country-specific Master\u2019s scholarships at Dutch universities, sponsored by Nuffic Neso offices.',
+    value: 'Partial-to-full tuition coverage',
+    notes: 'Each Neso office runs a country-specific list; deadlines vary slightly by country.',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'swedish-institute-scholarship',
+    name: 'Swedish Institute Scholarship for Global Professionals',
+    country: 'Sweden',
+    levels: ['Master'],
+    funding: 'FULL',
+    typicalOpen: { month: 2, day: 1 },
+    typicalClose: { month: 2, day: 15 },
+    officialUrl: 'https://si.se/en/apply/scholarships/',
+    description:
+      'One-year tuition + living costs scholarship for Master\u2019s students from selected developing countries.',
+    value: 'Tuition + SEK 12,000/month + travel',
+    notes: 'Very short window (often two weeks)  set a calendar reminder for late January.',
+    verifiedYear: 2025,
+  },
+  {
+    slug: 'gov-of-ireland-scholarship',
+    name: 'Government of Ireland International Scholarship',
+    country: 'Ireland',
+    levels: ['Master', 'PhD'],
+    funding: 'PARTIAL',
+    typicalOpen: { month: 2, day: 1 },
+    typicalClose: { month: 3, day: 22 },
+    officialUrl: 'https://hea.ie/funding-governance-performance/funding/student-finance/government-of-ireland-international-education-scholarships/',
+    description:
+      'One-year fee waiver plus stipend at any Irish public higher-education institution.',
+    value: '€10,000 stipend + tuition waiver',
+    verifiedYear: 2025,
+  },
+]

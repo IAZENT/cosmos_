@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { SectionLabel } from '@/components/ui/SectionLabel'
+import { CycleCalendar } from '@/components/scholarships/CycleCalendar'
 import { ScholarshipFeed } from '@/components/scholarships/ScholarshipFeed'
 
 export const metadata: Metadata = {
@@ -61,8 +62,27 @@ export default function ScholarshipsPage() {
           </div>
         </section>
 
-        <section className="px-4 pb-24 sm:px-6 sm:pb-32 md:px-12">
+        <section className="px-4 pb-12 sm:px-6 md:px-12">
           <div className="cosmos-container">
+            <CycleCalendar />
+          </div>
+        </section>
+
+        <section className="px-4 pb-24 sm:px-6 sm:pb-32 md:px-12">
+          <div className="cosmos-container flex flex-col gap-4">
+            <div>
+              <p className="font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--cosmos-code)]">
+                {'// live news feed'}
+              </p>
+              <h2 className="mt-1 text-[20px] text-[var(--cosmos-text)]">
+                Recent postings
+              </h2>
+              <p className="mt-1 max-w-2xl text-[13px] text-[var(--cosmos-text-muted)]">
+                Aggregated from public RSS sources every 6 hours. Use the
+                filters to drill into a specific country, level, or funding
+                type.
+              </p>
+            </div>
             <ScholarshipFeed />
           </div>
         </section>

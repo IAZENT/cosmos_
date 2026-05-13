@@ -29,10 +29,14 @@ export const SCHOLARSHIP_SOURCES: SourceDef[] = [
   { kind: 'rss', name: 'ScholarshipRoar', url: 'https://scholarshiproar.com/feed/' },
 
   // Germany-focused: matches the user's primary use case (DAAD-flavoured
-  // postings, German universities, Studienkolleg, etc.).
+  // postings, German universities, Studienkolleg, etc.). Cloudflare-
+  // fronted  requires a browser-like User-Agent (handled in parse.ts).
   { kind: 'rss', name: 'StudyingInGermany', url: 'https://www.studying-in-germany.org/feed/' },
 
-  // Official EU researcher portal. PhD positions, postdoc fellowships,
-  // Marie Sklodowska-Curie grants. Adapter handles the JSON format.
-  { kind: 'euraxess', name: 'EURAXESS' },
+  // EURAXESS  the official EU researcher portal  is intentionally
+  // omitted right now: their public API surface changed in late 2025
+  // and the previous undocumented JSON endpoint we relied on returns
+  // 404. The adapter in parse.ts (`fetchEuraxess`) is kept around so
+  // we can re-enable this source as soon as a stable feed URL is
+  // confirmed. Re-add with: { kind: 'euraxess', name: 'EURAXESS' }
 ]

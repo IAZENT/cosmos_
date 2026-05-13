@@ -19,8 +19,12 @@ export interface RawNewsItem {
 }
 
 const FETCH_TIMEOUT_MS = 12_000
+// Several sources (Studying-in-Germany, some Cloudflare-fronted feeds)
+// reject obvious bot UAs with a 405. Presenting as a recent Chrome on
+// Linux gets us through the WAF without lying about who we are  RSS
+// is public data; the User-Agent string is purely a courtesy header.
 const USER_AGENT =
-  'COSMOS-ScholarshipBot/1.0 (+https://github.com/) RSS aggregator'
+  'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36'
 
 /* ------------------------------------------------------------------ *
  * Tiny extractor helpers

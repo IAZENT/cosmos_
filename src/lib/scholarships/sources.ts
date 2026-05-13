@@ -33,6 +33,24 @@ export const SCHOLARSHIP_SOURCES: SourceDef[] = [
   // fronted  requires a browser-like User-Agent (handled in parse.ts).
   { kind: 'rss', name: 'StudyingInGermany', url: 'https://www.studying-in-germany.org/feed/' },
 
+  // Broad youth-opportunity aggregator. Mostly fellowships, conference
+  // grants, and undergraduate-level scholarships. Lower overlap with
+  // OpportunityDesk than expected.
+  { kind: 'rss', name: 'OpportunitiesForYouth', url: 'https://opportunitiesforyouth.org/feed/' },
+
+  // Africa-focused, but the vast majority of postings are *global*
+  // scholarships open to international students  the editorial focus
+  // is "what's available to African students", which usually means
+  // EU / Germany / UK / North America funded programmes. Strong
+  // overlap with the user's primary audience.
+  { kind: 'rss', name: 'OpportunitiesForAfricans', url: 'https://opportunitiesforafricans.com/feed/' },
+
+  // Heavy on Postdoc + research-position postings (Sydney, MPI, ETH,
+  // etc.). Adds the PhD/postdoc layer that the other aggregators
+  // under-cover. Note: includes some pure-academic-job posts; our
+  // level tagger usually flags these correctly as Postdoc.
+  { kind: 'rss', name: 'ScholarIdea', url: 'https://www.scholaridea.com/feed/' },
+
   // EURAXESS  the official EU researcher portal  is intentionally
   // omitted right now: their public API surface changed in late 2025
   // and the previous undocumented JSON endpoint we relied on returns

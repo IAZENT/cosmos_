@@ -47,8 +47,10 @@ export default function ScholarshipsPage() {
               <strong>Scholars4Dev</strong>,{' '}
               <strong>ScholarshipRegion</strong>,{' '}
               <strong>ScholarshipRoar</strong>,{' '}
-              <strong>Studying-in-Germany</strong>, and the official EU{' '}
-              <strong>EURAXESS</strong> portal. Filter by country, level, or
+              <strong>Studying-in-Germany</strong>,{' '}
+              <strong>Opportunities&nbsp;For&nbsp;Youth</strong>,{' '}
+              <strong>Opportunities&nbsp;For&nbsp;Africans</strong>, and{' '}
+              <strong>ScholarIdea</strong>. Filter by country, level, or
               funding type. Click through to apply on the original site 
               we never gate the source.
             </p>

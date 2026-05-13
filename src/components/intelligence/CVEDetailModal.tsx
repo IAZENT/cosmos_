@@ -1,6 +1,7 @@
 'use client'
 
-import { Check, ExternalLink, Share2, X } from 'lucide-react'
+import { Check, ExternalLink, Link2, Share2, X } from 'lucide-react'
+import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { SeverityBadge } from '@/components/ui/SeverityBadge'
 import { formatRelative, formatUTC } from '@/lib/utils/date'
@@ -85,9 +86,14 @@ export function CVEDetailModal({
 
   const handleShare = async () => {
     try {
-      const url = new URL(window.location.href)
-      url.searchParams.set('cve', cve.cve_id)
-      await navigator.clipboard.writeText(url.toString())
+      // Copy the canonical permalink rather than the modal-deep-link
+      // querystring. This makes shared links survive a future modal
+      // refactor and improves SEO previews when the link is posted.
+      const origin =
+        typeof window !== 'undefined' ? window.location.origin : ''
+      await navigator.clipboard.writeText(
+        `${origin}/intelligence/cve/${cve.cve_id}`,
+      )
       setShared(true)
       window.setTimeout(() => setShared(false), 1500)
     } catch {
@@ -187,7 +193,15 @@ export function CVEDetailModal({
           </div>
         ) : null}
 
-        <div className="mt-6 flex items-center justify-end gap-2">
+        <div className="mt-6 flex flex-wrap items-center justify-end gap-2">
+          <Link
+            href={`/intelligence/cve/${cve.cve_id}`}
+            className="cosmos-btn-ghost"
+            onClick={onClose}
+          >
+            <Link2 size={12} aria-hidden />
+            Open permalink
+          </Link>
           <button
             type="button"
             onClick={handleShare}

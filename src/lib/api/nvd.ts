@@ -21,8 +21,9 @@ export interface NVDFetchParams {
   noRejected?: boolean
 }
 
-function buildNVDUrl(params: NVDFetchParams): string {
+function buildNVDUrl(params: NVDFetchParams & { cveId?: string }): string {
   const search = new URLSearchParams()
+  if (params.cveId) search.set('cveId', params.cveId)
   if (params.resultsPerPage != null)
     search.set('resultsPerPage', String(params.resultsPerPage))
   if (params.startIndex != null)
@@ -35,6 +36,51 @@ function buildNVDUrl(params: NVDFetchParams): string {
   const qs = search.toString()
   const base = nvdBaseUrl()
   return qs.length > 0 ? `${base}?${qs}` : base
+}
+
+/**
+ * Fetch a single CVE by ID. Returns null when NVD reports zero results
+ * (typical for malformed or withdrawn IDs). Throws on network/parse errors.
+ */
+export async function fetchNVDById(
+  cveId: string,
+  init: { revalidateSeconds?: number | false; timeoutMs?: number } = {},
+): Promise<CosmosCVE | null> {
+  const apiKey = process.env.NVD_API_KEY
+  const headers: HeadersInit = {
+    Accept: 'application/json',
+    'User-Agent': 'COSMOS-Platform/1.0 (+https://github.com/)',
+  }
+  if (apiKey) headers.apiKey = apiKey
+
+  const url = buildNVDUrl({ cveId })
+  const fetchInit: RequestInit & { next?: { revalidate: number | false } } = {
+    headers,
+  }
+  if (init.revalidateSeconds === undefined) {
+    fetchInit.next = { revalidate: 3600 }
+  } else {
+    fetchInit.next = { revalidate: init.revalidateSeconds }
+  }
+  const controller = new AbortController()
+  const timeout = setTimeout(
+    () => controller.abort(),
+    init.timeoutMs ?? 4000,
+  )
+  try {
+    const res = await fetch(url, { ...fetchInit, signal: controller.signal })
+    if (res.status === 404) return null
+    if (!res.ok) {
+      throw new Error(`NVD by-id fetch failed: ${res.status} ${res.statusText}`)
+    }
+    const json: unknown = await res.json()
+    const parsed = nvdResponseSchema.parse(json)
+    const first = parsed.vulnerabilities[0]
+    if (!first) return null
+    return normalizeNVDCve(first.cve)
+  } finally {
+    clearTimeout(timeout)
+  }
 }
 
 export async function fetchNVD(

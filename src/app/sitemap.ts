@@ -1,5 +1,6 @@
 import type { MetadataRoute } from 'next'
 import { listPublishedResearch } from '@/lib/content/server-data'
+import { listRecentCveIds } from '@/lib/intel/cve-detail'
 
 const STATIC_ROUTES = [
   '',
@@ -41,5 +42,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     /* sitemap should never throw  degrade silently */
   }
 
-  return [...staticEntries, ...researchEntries]
+  // Include up to 2000 most-recent CVEs. NVD publishes ~25k/year so a full
+  // dump would be 200k+ urls and break crawlers' sitemap parsers. The cap
+  // keeps the file under the 50MB / 50k-url sitemap limit and prioritises
+  // the records most likely to be searched.
+  let cveEntries: MetadataRoute.Sitemap = []
+  try {
+    const cves = await listRecentCveIds(2000)
+    cveEntries = cves.map((c) => ({
+      url: `${base}/intelligence/cve/${c.cveId}`,
+      lastModified: c.modifiedAt ? new Date(c.modifiedAt) : now,
+      changeFrequency: 'monthly',
+      priority: 0.5,
+    }))
+  } catch {
+    /* sitemap should never throw  degrade silently */
+  }
+
+  return [...staticEntries, ...researchEntries, ...cveEntries]
 }

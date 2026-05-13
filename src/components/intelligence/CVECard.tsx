@@ -1,6 +1,7 @@
 'use client'
 
-import { Check, Copy, ExternalLink } from 'lucide-react'
+import { Check, Copy, ExternalLink, Link2 } from 'lucide-react'
+import Link from 'next/link'
 import { useState } from 'react'
 import { CosmosCard } from '@/components/ui/CosmosCard'
 import { SeverityBadge } from '@/components/ui/SeverityBadge'
@@ -51,9 +52,29 @@ export function CVECard({
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="font-mono text-[13px] text-[var(--cosmos-text)]">
+          {/* Permalink anchor: cmd+click opens detail page in a new tab,
+              plain click bubbles to the card and opens the modal. The
+              <Link> intercepts plain navigation by also calling
+              stopPropagation, *but only* on modifier-key clicks where we
+              want the browser to take over. */}
+          <Link
+            href={`/intelligence/cve/${cve.cve_id}`}
+            onClick={(e) => {
+              // Allow cmd/ctrl/shift/middle-click to open the permalink
+              // in a new tab/window without also triggering the modal.
+              if (e.metaKey || e.ctrlKey || e.shiftKey || e.button === 1) {
+                e.stopPropagation()
+                return
+              }
+              // Plain left-click: let the parent CosmosCard handle it
+              // (modal open). Prevent the link from navigating.
+              e.preventDefault()
+            }}
+            className="font-mono text-[13px] text-[var(--cosmos-text)] hover:underline"
+            aria-label={`Open ${cve.cve_id} permalink`}
+          >
             {cve.cve_id}
-          </span>
+          </Link>
           <SeverityBadge level={severity} />
           {cve.is_kev ? (
             <span className="rounded-full border border-[var(--cosmos-critical)] px-2 py-[2px] font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-critical)]">
@@ -111,19 +132,30 @@ export function CVECard({
         <span className="font-mono text-[11px] text-[var(--cosmos-text-dim)]">
           published {formatRelative(cve.published_at)}
         </span>
-        <button
-          type="button"
-          onClick={handleCopy}
-          className="inline-flex items-center gap-1.5 rounded-[4px] border border-[var(--cosmos-border)] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-muted)] hover:text-[var(--cosmos-text)]"
-          aria-label={`Copy ${cve.cve_id}`}
-        >
-          {copied ? (
-            <Check size={11} aria-hidden />
-          ) : (
-            <Copy size={11} aria-hidden />
-          )}
-          {copied ? 'copied' : 'copy id'}
-        </button>
+        <div className="flex items-center gap-2">
+          <Link
+            href={`/intelligence/cve/${cve.cve_id}`}
+            onClick={(e) => e.stopPropagation()}
+            className="inline-flex items-center gap-1.5 rounded-[4px] border border-[var(--cosmos-border)] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-muted)] hover:text-[var(--cosmos-text)]"
+            aria-label={`Open permalink for ${cve.cve_id}`}
+          >
+            <Link2 size={11} aria-hidden />
+            permalink
+          </Link>
+          <button
+            type="button"
+            onClick={handleCopy}
+            className="inline-flex items-center gap-1.5 rounded-[4px] border border-[var(--cosmos-border)] px-2 py-1 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-muted)] hover:text-[var(--cosmos-text)]"
+            aria-label={`Copy ${cve.cve_id}`}
+          >
+            {copied ? (
+              <Check size={11} aria-hidden />
+            ) : (
+              <Copy size={11} aria-hidden />
+            )}
+            {copied ? 'copied' : 'copy id'}
+          </button>
+        </div>
       </div>
     </CosmosCard>
   )

@@ -82,6 +82,37 @@ export interface Database {
           Partial<Pick<ResearchPostRow, 'id' | 'created_at' | 'updated_at'>>
         Update: Partial<ResearchPostRow>
       }
+      saved_searches: {
+        Row: SavedSearchDBRow
+        Insert: Omit<
+          SavedSearchDBRow,
+          'id' | 'created_at' | 'verified' | 'verified_at' | 'last_sent_at'
+        > &
+          Partial<
+            Pick<
+              SavedSearchDBRow,
+              | 'id'
+              | 'created_at'
+              | 'verified'
+              | 'verified_at'
+              | 'last_sent_at'
+            >
+          >
+        Update: Partial<SavedSearchDBRow>
+      }
     }
   }
+}
+
+export interface SavedSearchDBRow {
+  id: string
+  email: string
+  label: string | null
+  filters: unknown // JSONB  validated in app code
+  verified: boolean
+  verification_token: string
+  unsubscribe_token: string
+  last_sent_at: string | null
+  verified_at: string | null
+  created_at: string
 }

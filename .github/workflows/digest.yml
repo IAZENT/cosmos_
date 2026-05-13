@@ -1,0 +1,51 @@
+name: Send weekly CVE digest
+
+# Triggers /api/digest/saved-searches every Monday at 08:30 UTC
+# (~14:15 NPT). Picked Monday morning so users start their week with
+# fresh intelligence. Run manually from the Actions tab to test.
+#
+# Required repo secrets (same as sync-intel.yml):
+#   APP_URL       e.g. https://cosmos.example.com (no trailing slash)
+#   CRON_SECRET   matches CRON_SECRET on Vercel
+
+on:
+  schedule:
+    - cron: '30 8 * * 1'
+  workflow_dispatch:
+
+concurrency:
+  group: digest-saved-searches
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  send:
+    name: Send digests
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Hit /api/digest/saved-searches
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${APP_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::APP_URL or CRON_SECRET secret is not set."
+            exit 1
+          fi
+          curl --fail --show-error --silent --location \
+            --max-time 480 \
+            --retry 2 --retry-delay 15 --retry-connrefused \
+            -X POST \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "User-Agent: cosmos-digest-bot/1.0 (+github-actions)" \
+            "${APP_URL}/api/digest/saved-searches" \
+            | tee /tmp/digest.json
+          jq -e '.ok == true' /tmp/digest.json > /dev/null
+          processed=$(jq -r '.processed' /tmp/digest.json)
+          sent=$(jq -r '.sent' /tmp/digest.json)
+          skipped=$(jq -r '.skipped' /tmp/digest.json)
+          echo "::notice::digest run  processed=${processed} sent=${sent} skipped=${skipped}"

@@ -9,8 +9,10 @@ import {
   type CVEFilterState,
 } from '@/components/intelligence/CVEFilters'
 import { CVEDetailModal } from '@/components/intelligence/CVEDetailModal'
+import { SaveSearchButton } from '@/components/intelligence/SaveSearchButton'
 import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
+import type { SavedSearchFilters } from '@/types/saved-search'
 import type {
   CVEFeedResponse,
   CVEFeedRow,
@@ -123,13 +125,18 @@ export function CVEFeed() {
         onReset={handleReset}
       />
 
-      <div className="flex items-center justify-between font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--cosmos-text-dim)]">
+      <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--cosmos-text-dim)]">
         <span>
           {`// ${total.toLocaleString('en-US')} result${total === 1 ? '' : 's'}`}
         </span>
-        <span className={refiltering ? 'animate-pulse' : ''}>
-          {refiltering ? 'updating…' : `showing ${items.length}`}
-        </span>
+        <div className="flex items-center gap-3">
+          <SaveSearchButton
+            filters={effectiveFilters satisfies SavedSearchFilters}
+          />
+          <span className={refiltering ? 'animate-pulse' : ''}>
+            {refiltering ? 'updating…' : `showing ${items.length}`}
+          </span>
+        </div>
       </div>
 
       {initialLoading ? (

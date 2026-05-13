@@ -82,6 +82,14 @@ export interface Database {
           Partial<Pick<ResearchPostRow, 'id' | 'created_at' | 'updated_at'>>
         Update: Partial<ResearchPostRow>
       }
+      scholarship_news: {
+        Row: ScholarshipNewsDBRow
+        Insert: Omit<ScholarshipNewsDBRow, 'id' | 'created_at' | 'fetched_at'> &
+          Partial<
+            Pick<ScholarshipNewsDBRow, 'id' | 'created_at' | 'fetched_at'>
+          >
+        Update: Partial<ScholarshipNewsDBRow>
+      }
       saved_searches: {
         Row: SavedSearchDBRow
         Insert: Omit<
@@ -102,6 +110,22 @@ export interface Database {
       }
     }
   }
+}
+
+export interface ScholarshipNewsDBRow {
+  id: string
+  source: string
+  source_url: string
+  external_guid: string | null
+  title: string
+  summary: string | null
+  countries: string[]
+  levels: string[]
+  funding: string
+  deadline_at: string | null
+  published_at: string | null
+  fetched_at: string
+  created_at: string
 }
 
 export interface SavedSearchDBRow {

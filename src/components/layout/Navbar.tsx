@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils/cn'
 const NAV_LINKS: { label: string; href: string }[] = [
   { label: 'Intelligence', href: '/intelligence' },
   { label: 'News', href: '/news' },
+  { label: 'Scholarships', href: '/scholarships' },
   { label: 'Research', href: '/research' },
   { label: 'Resources', href: '/resources' },
   { label: 'Tools', href: '/tools' },

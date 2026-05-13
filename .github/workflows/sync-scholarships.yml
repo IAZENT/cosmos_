@@ -1,0 +1,50 @@
+name: Sync scholarship news
+
+# Pulls 5 RSS feeds + EURAXESS into Supabase. Runs every 6h: scholarship
+# postings are typically published once a day at most  6h gives 4
+# refreshes/day which is more than enough freshness.
+#
+# Required repo secrets:
+#   APP_URL       e.g. https://cosmos.example.com
+#   CRON_SECRET   shared with Vercel env var
+
+on:
+  schedule:
+    - cron: '12 */6 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: sync-scholarships
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  sync:
+    name: Sync scholarship sources
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Hit /api/sync/scholarships
+        env:
+          APP_URL: ${{ secrets.APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          set -euo pipefail
+          if [ -z "${APP_URL:-}" ] || [ -z "${CRON_SECRET:-}" ]; then
+            echo "::error::APP_URL or CRON_SECRET secret is not set."
+            exit 1
+          fi
+          curl --fail --show-error --silent --location \
+            --max-time 240 \
+            --retry 2 --retry-delay 10 --retry-connrefused \
+            -X POST \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            -H "User-Agent: cosmos-scholarship-bot/1.0 (+github-actions)" \
+            "${APP_URL}/api/sync/scholarships" \
+            | tee /tmp/scholarships.json
+          jq -e '.ok == true' /tmp/scholarships.json > /dev/null
+          fetched=$(jq -r '.fetched' /tmp/scholarships.json)
+          upserted=$(jq -r '.upserted' /tmp/scholarships.json)
+          echo "::notice::scholarships sync  fetched=${fetched} upserted=${upserted}"

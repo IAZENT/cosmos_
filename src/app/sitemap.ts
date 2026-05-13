@@ -5,6 +5,7 @@ import { listRecentCveIds } from '@/lib/intel/cve-detail'
 const STATIC_ROUTES = [
   '',
   '/intelligence',
+  '/scholarships',
   '/research',
   '/resources',
   '/resources/submit',

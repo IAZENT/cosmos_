@@ -5,6 +5,7 @@ import { HeroSection } from '@/components/home/HeroSection'
 import { ThreatTicker } from '@/components/home/ThreatTicker'
 import { ModuleGrid } from '@/components/home/ModuleGrid'
 import { LiveCVEPreview } from '@/components/home/LiveCVEPreview'
+import { ScholarshipPreview } from '@/components/home/ScholarshipPreview'
 import { Footer } from '@/components/layout/Footer'
 import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton'
 
@@ -33,6 +34,10 @@ export default function HomePage() {
         <Suspense fallback={<LiveCVESkeleton />}>
           <LiveCVEPreview />
         </Suspense>
+        {/* Pure-static section (uses the curated cycle constant)  no
+            data fetch, but the day-counters relax with the page-level
+            revalidate=60 so they stay fresh across midnight. */}
+        <ScholarshipPreview />
       </main>
       <Footer />
     </>

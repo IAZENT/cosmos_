@@ -50,6 +50,30 @@ export interface ScholarshipCycle {
    * and helps remind us when an entry needs review.
    */
   verifiedYear: number
+  /**
+   * Lowercase tokens used to detect mentions of this scholarship in
+   * the live RSS feed (`scholarship_news` table). A row counts as a
+   * mention if ANY token appears in title or summary. Pick distinctive
+   * brand terms ('daad', 'chevening')  generic words like 'germany'
+   * would create too many false positives.
+   *
+   * The presence of recent mentions is what makes the cycle 'live':
+   * it's surfaced as an `📰 active · N mentions / 30d` badge and
+   * functions as auto-verification, replacing the manual yearly
+   * `verifiedYear` bump.
+   */
+  matchKeywords: string[]
+}
+
+export interface CycleActivity {
+  /** Number of scholarship_news rows mentioning this cycle in the last 30 days. */
+  mentions30d: number
+  /**
+   * True when there is enough activity to treat the cycle as 'currently
+   * verified by the live feed'  the UI uses this to hide the
+   * 'verifiedYear' badge and instead show an auto-verified marker.
+   */
+  liveVerified: boolean
 }
 
 export type CycleStatus =

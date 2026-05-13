@@ -1,33 +1,29 @@
 import Link from 'next/link'
-import { Calendar, Clock } from 'lucide-react'
+import { Activity, Calendar, Clock } from 'lucide-react'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { CosmosCard } from '@/components/ui/CosmosCard'
 import { SCHOLARSHIP_CYCLES } from '@/data/scholarship-cycles'
 import { formatMonthDay, withStatus } from '@/lib/scholarships/cycle'
+import { getCycleActivity } from '@/lib/scholarships/cycle-server'
 import {
   FLAG_BY_COUNTRY,
   type ScholarshipCountry,
 } from '@/types/scholarship'
-import type { CycleStatus } from '@/types/scholarship-cycle'
+import type {
+  CycleActivity,
+  CycleStatus,
+} from '@/types/scholarship-cycle'
 
 const PREVIEW_COUNT = 3
-// Slightly above 30 so the preview can pad to PREVIEW_COUNT cards even
-// in late-quiet months. Empirically Aug-Nov is dense (Chevening, DAAD,
-// Eiffel etc.); Apr-May is the sparsest.
-const PREVIEW_HORIZON_DAYS = 60
+// 90 days is generous: the homepage promises 'next 90 days', which is
+// long enough that the section is never empty (the cycle calendar has
+// at least 3 entries opening within any 90-day window).
+const PREVIEW_HORIZON_DAYS = 90
 
 function StatusBadge({ status }: { status: CycleStatus }) {
-  if (status.kind === 'open_now') {
-    return (
-      <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--cosmos-low)] px-2 py-[2px] font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-low)]">
-        <span className="relative flex h-1.5 w-1.5">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--cosmos-low)] opacity-75" />
-          <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-[var(--cosmos-low)]" />
-        </span>
-        open · closes {status.daysUntilClose}d
-      </span>
-    )
-  }
+  // Note: we intentionally never render the 'open_now' variant here 
+  // the homepage section is exclusively for *upcoming* cycles. The
+  // /scholarships page handles the 'currently open' case.
   if (status.kind === 'opening_soon') {
     return (
       <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--cosmos-medium)] px-2 py-[2px] font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-medium)]">
@@ -36,43 +32,67 @@ function StatusBadge({ status }: { status: CycleStatus }) {
       </span>
     )
   }
+  if (status.kind === 'later') {
+    return (
+      <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--cosmos-border)] px-2 py-[2px] font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-dim)]">
+        <Calendar size={10} aria-hidden />
+        opens in {status.daysUntilOpen}d
+      </span>
+    )
+  }
+  return null
+}
+
+function ActivityBadge({ activity }: { activity: CycleActivity }) {
+  if (activity.mentions30d === 0) return null
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-[var(--cosmos-border)] px-2 py-[2px] font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-dim)]">
-      <Calendar size={10} aria-hidden />
-      opens in {status.daysUntilOpen}d
+    <span
+      className="inline-flex items-center gap-1 rounded-full border border-[var(--cosmos-accent)] bg-[var(--cosmos-bg-subtle)] px-2 py-[2px] font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-accent)]"
+      title="Currently active in our live RSS feed (last 30 days)"
+    >
+      <Activity size={10} aria-hidden />
+      live · {activity.mentions30d}
     </span>
   )
 }
 
 /**
- * Homepage section: 3 most-urgent scholarship cycles.
+ * Homepage section: the next 3 *upcoming* scholarship cycles.
  *
- * This is a server component because the cycle data is a static TS
- * constant  no SWR or client state needed, and rendering on the server
- * keeps the homepage TTFB snappy. The status calculation depends on
- * `new Date()` so we set `revalidate` on the page (already 60s) to keep
- * the day-counter fresh.
+ * Selection logic (post-user-feedback):
+ *   - Strictly excludes `open_now` cycles  the homepage promise is
+ *     'opening in the next 90 days', not 'currently open'.
+ *   - Prefers `opening_soon` (within 90 days), sorted by soonest open.
+ *   - Pads with `later` items if fewer than 3 are within the horizon.
+ *
+ * Dynamism:
+ *   - Day counters refresh with the page-level `revalidate=60`, so
+ *     'opens in 23d' is always within a minute of accurate.
+ *   - Live activity badge surfaces the news-mention count from the last
+ *     30 days  no manual data updates required when a cycle goes live.
+ *   - Year auto-rolls via `withStatus()`: when 2026's cycle ends,
+ *     2027's takes its place automatically.
  */
-export function ScholarshipPreview() {
+export async function ScholarshipPreview() {
   const all = withStatus(SCHOLARSHIP_CYCLES)
 
-  // Prefer urgent items (open_now + opening_soon within horizon); fall
-  // back to the next-soonest 'later' items to always fill the row.
-  const urgent = all.filter(
+  // Strict 'opening_soon within horizon', then 'later' as fallback.
+  // We never include open_now  this section is forward-looking.
+  const upcoming = all.filter(
     (i) =>
-      i.status.kind === 'open_now' ||
-      (i.status.kind === 'opening_soon' &&
-        i.status.daysUntilOpen <= PREVIEW_HORIZON_DAYS),
+      i.status.kind === 'opening_soon' &&
+      i.status.daysUntilOpen <= PREVIEW_HORIZON_DAYS,
   )
-  const padded =
-    urgent.length >= PREVIEW_COUNT
-      ? urgent.slice(0, PREVIEW_COUNT)
-      : [
-          ...urgent,
-          ...all
-            .filter((i) => i.status.kind === 'later')
-            .slice(0, PREVIEW_COUNT - urgent.length),
-        ]
+  const fallback = all.filter((i) => i.status.kind === 'later')
+  const picks = [
+    ...upcoming,
+    ...fallback.slice(0, Math.max(0, PREVIEW_COUNT - upcoming.length)),
+  ].slice(0, PREVIEW_COUNT)
+
+  // Fetch activity only for the selected slugs  no point hitting
+  // Supabase for cycles we won't render. (The DB query itself is one
+  // round trip; this just trims the post-fetch matching.)
+  const activity = await getCycleActivity(picks.map((p) => p.cycle))
 
   return (
     <section className="cosmos-section">
@@ -82,7 +102,7 @@ export function ScholarshipPreview() {
           <h2 className="max-w-xl text-[40px] leading-[1.1] tracking-[-0.02em] text-[var(--cosmos-text)] md:text-[56px]">
             Scholarships opening
             <br />
-            in the next 60 days.
+            in the next 90 days.
           </h2>
           <Link
             href="/scholarships"
@@ -93,10 +113,14 @@ export function ScholarshipPreview() {
         </div>
 
         <div className="mt-12 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
-          {padded.map((item) => {
+          {picks.map((item) => {
             const { cycle, status } = item
             const flag =
               FLAG_BY_COUNTRY[cycle.country as ScholarshipCountry] ?? '🌍'
+            const a = activity.get(cycle.slug) ?? {
+              mentions30d: 0,
+              liveVerified: false,
+            }
             return (
               <a
                 key={cycle.slug}
@@ -106,39 +130,42 @@ export function ScholarshipPreview() {
                 className="block"
                 aria-label={`${cycle.name}  open official page`}
               >
-              <CosmosCard
-                interactive
-                className="flex h-full flex-col gap-3"
-              >
-                <div className="flex items-start justify-between gap-3">
-                  <span className="text-[24px] leading-none" aria-hidden>
-                    {flag}
-                  </span>
-                  <StatusBadge status={status} />
-                </div>
-                <h3 className="text-[16px] leading-snug text-[var(--cosmos-text)]">
-                  {cycle.name}
-                </h3>
-                <p className="min-h-[3.6rem] text-[12px] leading-relaxed text-[var(--cosmos-text-muted)]">
-                  {cycle.description.length > 130
-                    ? `${cycle.description.slice(0, 130)}…`
-                    : cycle.description}
-                </p>
-                <div className="mt-auto flex items-center justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-dim)]">
-                  <span>
-                    {formatMonthDay(
-                      cycle.typicalOpen.month,
-                      cycle.typicalOpen.day,
-                    )}
-                    {' → '}
-                    {formatMonthDay(
-                      cycle.typicalClose.month,
-                      cycle.typicalClose.day,
-                    )}
-                  </span>
-                  <span>{cycle.country}</span>
-                </div>
-              </CosmosCard>
+                <CosmosCard
+                  interactive
+                  className="flex h-full flex-col gap-3"
+                >
+                  <div className="flex items-start justify-between gap-3">
+                    <span className="text-[24px] leading-none" aria-hidden>
+                      {flag}
+                    </span>
+                    <div className="flex flex-wrap items-center justify-end gap-1.5">
+                      <ActivityBadge activity={a} />
+                      <StatusBadge status={status} />
+                    </div>
+                  </div>
+                  <h3 className="text-[16px] leading-snug text-[var(--cosmos-text)]">
+                    {cycle.name}
+                  </h3>
+                  <p className="min-h-[3.6rem] text-[12px] leading-relaxed text-[var(--cosmos-text-muted)]">
+                    {cycle.description.length > 130
+                      ? `${cycle.description.slice(0, 130)}…`
+                      : cycle.description}
+                  </p>
+                  <div className="mt-auto flex items-center justify-between gap-2 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-dim)]">
+                    <span>
+                      {formatMonthDay(
+                        cycle.typicalOpen.month,
+                        cycle.typicalOpen.day,
+                      )}
+                      {' → '}
+                      {formatMonthDay(
+                        cycle.typicalClose.month,
+                        cycle.typicalClose.day,
+                      )}
+                    </span>
+                    <span>{cycle.country}</span>
+                  </div>
+                </CosmosCard>
               </a>
             )
           })}

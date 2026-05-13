@@ -34,10 +34,14 @@ export default function HomePage() {
         <Suspense fallback={<LiveCVESkeleton />}>
           <LiveCVEPreview />
         </Suspense>
-        {/* Pure-static section (uses the curated cycle constant)  no
-            data fetch, but the day-counters relax with the page-level
-            revalidate=60 so they stay fresh across midnight. */}
-        <ScholarshipPreview />
+        {/* Async server component: hits Supabase to count news mentions
+            for the cycles it picks, so the 'live · N' badge auto-updates
+            as the RSS sync writes new rows. Cheap query (one round trip,
+            ≤200 rows) but suspended so it never blocks the rest of the
+            shell. */}
+        <Suspense fallback={<ScholarshipSkeleton />}>
+          <ScholarshipPreview />
+        </Suspense>
       </main>
       <Footer />
     </>
@@ -78,6 +82,22 @@ function LiveCVESkeleton() {
         <LoadingSkeleton className="h-12 w-[420px] max-w-full" />
         <div className="mt-12 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
           {Array.from({ length: 6 }).map((_, i) => (
+            <LoadingSkeleton key={i} className="h-44 w-full" />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function ScholarshipSkeleton() {
+  // Three placeholder cards while the live mention-count query resolves.
+  return (
+    <section className="cosmos-section">
+      <div className="cosmos-container">
+        <LoadingSkeleton className="h-12 w-[360px] max-w-full" />
+        <div className="mt-12 grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
+          {Array.from({ length: 3 }).map((_, i) => (
             <LoadingSkeleton key={i} className="h-44 w-full" />
           ))}
         </div>

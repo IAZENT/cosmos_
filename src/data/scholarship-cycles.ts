@@ -19,6 +19,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'daad-study-scholarship',
     name: 'DAAD Study Scholarship (Master)',
+    matchKeywords: ['daad', 'deutscher akademischer'],
     country: 'Germany',
     levels: ['Master'],
     funding: 'FULL',
@@ -36,6 +37,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'daad-research-grant',
     name: 'DAAD Research Grant (PhD)',
+    matchKeywords: ['daad research', 'daad phd', 'daad doctoral'],
     country: 'Germany',
     levels: ['PhD'],
     funding: 'FULL',
@@ -52,6 +54,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'daad-wise',
     name: 'DAAD WISE (Bachelor summer research)',
+    matchKeywords: ['daad wise', 'wise scholarship'],
     country: 'Germany',
     levels: ['Bachelor'],
     funding: 'FULL',
@@ -67,6 +70,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'heinrich-boll-foundation',
     name: 'Heinrich Böll Foundation Scholarship',
+    matchKeywords: ['heinrich böll', 'heinrich boll', 'boell foundation'],
     country: 'Germany',
     levels: ['Master', 'PhD'],
     funding: 'FULL',
@@ -82,6 +86,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'konrad-adenauer-stiftung',
     name: 'Konrad-Adenauer-Stiftung Scholarship',
+    matchKeywords: ['konrad-adenauer', 'konrad adenauer', 'kas scholarship'],
     country: 'Germany',
     levels: ['Master', 'PhD'],
     funding: 'FULL',
@@ -96,6 +101,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'humboldt-research-fellowship',
     name: 'Humboldt Research Fellowship (Postdoc)',
+    matchKeywords: ['humboldt research', 'humboldt fellowship', 'humboldt foundation'],
     country: 'Germany',
     levels: ['Postdoc'],
     funding: 'FULL',
@@ -112,6 +118,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'erasmus-mundus-joint-masters',
     name: 'Erasmus Mundus Joint Master\u2019s',
+    matchKeywords: ['erasmus mundus', 'emjm'],
     country: 'EU',
     levels: ['Master'],
     funding: 'FULL',
@@ -128,6 +135,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'msca-postdoctoral-fellowship',
     name: 'Marie Sk\u0142odowska-Curie Postdoctoral Fellowship',
+    matchKeywords: ['msca', 'marie skłodowska', 'marie sklodowska', 'marie curie'],
     country: 'EU',
     levels: ['Postdoc'],
     funding: 'FULL',
@@ -145,6 +153,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'chevening',
     name: 'Chevening Scholarship',
+    matchKeywords: ['chevening'],
     country: 'UK',
     levels: ['Master'],
     funding: 'FULL',
@@ -159,6 +168,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'commonwealth-scholarship',
     name: 'Commonwealth Scholarship',
+    matchKeywords: ['commonwealth scholarship', 'commonwealth shared'],
     country: 'UK',
     levels: ['Master', 'PhD'],
     funding: 'FULL',
@@ -173,6 +183,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'gates-cambridge',
     name: 'Gates Cambridge Scholarship',
+    matchKeywords: ['gates cambridge'],
     country: 'UK',
     levels: ['Master', 'PhD'],
     funding: 'FULL',
@@ -188,6 +199,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'rhodes-scholarship',
     name: 'Rhodes Scholarship',
+    matchKeywords: ['rhodes scholarship'],
     country: 'UK',
     levels: ['Master', 'PhD'],
     funding: 'FULL',
@@ -205,6 +217,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'fulbright-foreign-student',
     name: 'Fulbright Foreign Student Program',
+    matchKeywords: ['fulbright'],
     country: 'USA',
     levels: ['Master', 'PhD'],
     funding: 'FULL',
@@ -220,6 +233,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'humphrey-fellowship',
     name: 'Hubert H. Humphrey Fellowship',
+    matchKeywords: ['humphrey fellowship', 'hubert humphrey'],
     country: 'USA',
     levels: ['Short-term'],
     funding: 'FULL',
@@ -234,6 +248,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'knight-hennessy',
     name: 'Knight-Hennessy Scholars (Stanford)',
+    matchKeywords: ['knight-hennessy', 'knight hennessy'],
     country: 'USA',
     levels: ['Master', 'PhD'],
     funding: 'FULL',
@@ -250,6 +265,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'mext',
     name: 'MEXT (Japanese Government Scholarship)',
+    matchKeywords: ['mext', 'monbukagakusho', 'japanese government scholarship'],
     country: 'Japan',
     levels: ['Bachelor', 'Master', 'PhD'],
     funding: 'FULL',
@@ -266,6 +282,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'kgsp-graduate',
     name: 'Global Korea Scholarship (Graduate)',
+    matchKeywords: ['kgsp', 'global korea scholarship'],
     country: 'South Korea',
     levels: ['Master', 'PhD'],
     funding: 'FULL',
@@ -280,6 +297,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'kgsp-undergraduate',
     name: 'Global Korea Scholarship (Undergraduate)',
+    matchKeywords: ['kgsp', 'global korea scholarship'],
     country: 'South Korea',
     levels: ['Bachelor'],
     funding: 'FULL',
@@ -294,6 +312,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'csc-china',
     name: 'Chinese Government Scholarship (CSC)',
+    matchKeywords: ['csc scholarship', 'chinese government scholarship', 'china scholarship council'],
     country: 'China',
     levels: ['Bachelor', 'Master', 'PhD'],
     funding: 'FULL',
@@ -308,6 +327,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'singapore-sgs',
     name: 'Singapore International Graduate Award (SINGA)',
+    matchKeywords: ['singa', 'singapore international graduate'],
     country: 'Singapore',
     levels: ['PhD'],
     funding: 'FULL',
@@ -325,6 +345,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'australia-awards',
     name: 'Australia Awards Scholarship',
+    matchKeywords: ['australia awards'],
     country: 'Australia',
     levels: ['Master', 'PhD'],
     funding: 'FULL',
@@ -340,6 +361,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'nz-manaaki',
     name: 'Manaaki New Zealand Scholarship',
+    matchKeywords: ['manaaki', 'new zealand scholarship'],
     country: 'New Zealand',
     levels: ['Master', 'PhD', 'Short-term'],
     funding: 'FULL',
@@ -356,6 +378,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'vanier',
     name: 'Vanier Canada Graduate Scholarship',
+    matchKeywords: ['vanier'],
     country: 'Canada',
     levels: ['PhD'],
     funding: 'FULL',
@@ -371,6 +394,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'banting-postdoc',
     name: 'Banting Postdoctoral Fellowship',
+    matchKeywords: ['banting'],
     country: 'Canada',
     levels: ['Postdoc'],
     funding: 'FULL',
@@ -387,6 +411,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'eiffel',
     name: 'Eiffel Excellence Scholarship (France)',
+    matchKeywords: ['eiffel scholarship', 'eiffel excellence'],
     country: 'France',
     levels: ['Master', 'PhD'],
     funding: 'FULL',
@@ -401,6 +426,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'swiss-government-excellence',
     name: 'Swiss Government Excellence Scholarship',
+    matchKeywords: ['swiss government excellence', 'eskas'],
     country: 'Switzerland',
     levels: ['Master', 'PhD', 'Postdoc'],
     funding: 'FULL',
@@ -416,6 +442,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'stipendium-hungaricum',
     name: 'Stipendium Hungaricum',
+    matchKeywords: ['stipendium hungaricum'],
     country: 'Hungary',
     levels: ['Bachelor', 'Master', 'PhD'],
     funding: 'FULL',
@@ -430,6 +457,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'turkiye-burslari',
     name: 'Türkiye Bursları',
+    matchKeywords: ['türkiye bursları', 'turkiye burslari', 'turkey scholarships'],
     country: 'Turkey',
     levels: ['Bachelor', 'Master', 'PhD'],
     funding: 'FULL',
@@ -444,6 +472,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'orange-tulip',
     name: 'Orange Tulip Scholarship (Netherlands)',
+    matchKeywords: ['orange tulip'],
     country: 'Netherlands',
     levels: ['Master'],
     funding: 'PARTIAL',
@@ -459,6 +488,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'swedish-institute-scholarship',
     name: 'Swedish Institute Scholarship for Global Professionals',
+    matchKeywords: ['swedish institute', 'sisgp'],
     country: 'Sweden',
     levels: ['Master'],
     funding: 'FULL',
@@ -474,6 +504,7 @@ export const SCHOLARSHIP_CYCLES: ScholarshipCycle[] = [
   {
     slug: 'gov-of-ireland-scholarship',
     name: 'Government of Ireland International Scholarship',
+    matchKeywords: ['government of ireland scholarship', 'ireland international scholarship'],
     country: 'Ireland',
     levels: ['Master', 'PhD'],
     funding: 'PARTIAL',

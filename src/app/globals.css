@@ -3,25 +3,189 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --cosmos-bg:          #0A0A0A;
+  --cosmos-bg-elevated: #111111;
+  --cosmos-bg-subtle:   #161616;
+  --cosmos-border:      #222222;
+  --cosmos-border-dim:  #1A1A1A;
+  --cosmos-text:        #F0EBE1;
+  --cosmos-text-muted:  #888888;
+  --cosmos-text-dim:    #444444;
+  --cosmos-accent:      #C8A96E;
+  --cosmos-accent-dim:  #2A2218;
+  --cosmos-code:        #7A9E7A;
+  --cosmos-critical:    #C0392B;
+  --cosmos-high:        #E67E22;
+  --cosmos-medium:      #D4AC0D;
+  --cosmos-low:         #27AE60;
+  --cosmos-info:        #2980B9;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  background-color: var(--cosmos-bg);
+  color: var(--cosmos-text);
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  background-color: var(--cosmos-bg);
+  color: var(--cosmos-text);
+  min-height: 100vh;
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  color: inherit;
+}
+
+input,
+textarea,
+select {
+  font-family: inherit;
+  color: inherit;
+  background: transparent;
+}
+
+::selection {
+  background: var(--cosmos-accent-dim);
+  color: var(--cosmos-accent);
+}
+
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+::-webkit-scrollbar-track {
+  background: var(--cosmos-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--cosmos-border);
+  border-radius: 2px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--cosmos-text-dim);
+}
+
+@layer components {
+  .cosmos-label {
+    @apply font-mono text-[11px] tracking-[0.12em] uppercase;
+    color: var(--cosmos-code);
   }
+
+  .cosmos-card {
+    background: var(--cosmos-bg-elevated);
+    border: 1px solid var(--cosmos-border);
+    border-radius: 6px;
+    padding: 20px 24px;
+  }
+
+  .cosmos-section {
+    @apply py-[120px] px-6 md:px-12;
+  }
+
+  .cosmos-container {
+    @apply max-w-cosmos mx-auto;
+  }
+
+  .cosmos-btn-primary {
+    @apply inline-flex items-center gap-2 font-mono text-[12px] tracking-[0.06em] uppercase;
+    background: var(--cosmos-accent-dim);
+    color: var(--cosmos-accent);
+    border: 1px solid var(--cosmos-accent-dim);
+    border-radius: 4px;
+    padding: 8px 16px;
+    transition: border-color 150ms ease;
+  }
+  .cosmos-btn-primary:hover {
+    border-color: var(--cosmos-accent);
+  }
+
+  .cosmos-btn-ghost {
+    @apply inline-flex items-center gap-2 font-mono text-[12px] tracking-[0.06em] uppercase;
+    background: transparent;
+    color: var(--cosmos-text-muted);
+    border: 1px solid var(--cosmos-border);
+    border-radius: 4px;
+    padding: 8px 16px;
+    transition: border-color 150ms ease, color 150ms ease;
+  }
+  .cosmos-btn-ghost:hover {
+    color: var(--cosmos-text);
+    border-color: #333333;
+  }
+}
+
+/* -----------------------------------------------------------------
+ * @uiw/react-md-editor theme override.
+ * Applied only inside .cosmos-md-editor so we don't leak globally.
+ * -----------------------------------------------------------------
+ */
+.cosmos-md-editor .w-md-editor {
+  background: var(--cosmos-bg-subtle) !important;
+  color: var(--cosmos-text) !important;
+  border: 1px solid var(--cosmos-border) !important;
+  border-radius: 4px !important;
+  box-shadow: none !important;
+  font-family: var(--font-geist-mono), Courier New, monospace !important;
+}
+.cosmos-md-editor .w-md-editor-toolbar {
+  background: var(--cosmos-bg-elevated) !important;
+  border-bottom: 1px solid var(--cosmos-border-dim) !important;
+}
+.cosmos-md-editor .w-md-editor-toolbar li > button {
+  color: var(--cosmos-text-muted) !important;
+}
+.cosmos-md-editor .w-md-editor-toolbar li > button:hover {
+  color: var(--cosmos-text) !important;
+  background: var(--cosmos-bg-subtle) !important;
+}
+.cosmos-md-editor .w-md-editor-text,
+.cosmos-md-editor .w-md-editor-text-pre,
+.cosmos-md-editor .w-md-editor-text-input,
+.cosmos-md-editor .w-md-editor-preview {
+  background: var(--cosmos-bg-subtle) !important;
+  color: var(--cosmos-text) !important;
+  font-family: var(--font-geist-mono), Courier New, monospace !important;
+  font-size: 13px !important;
+}
+.cosmos-md-editor .w-md-editor-preview {
+  background: var(--cosmos-bg) !important;
+  border-left: 1px solid var(--cosmos-border-dim) !important;
+}
+.cosmos-md-editor .w-md-editor-preview pre {
+  background: var(--cosmos-bg-subtle) !important;
+  border: 1px solid var(--cosmos-border) !important;
+  border-radius: 4px !important;
+}
+.cosmos-md-editor .w-md-editor-preview code {
+  background: var(--cosmos-bg-subtle);
+  color: var(--cosmos-accent);
+}
+
+/* -----------------------------------------------------------------
+ * highlight.js theme polish. atom-one-dark already covers most of it;
+ * these rules just soften the canvas to match cosmos-bg-subtle.
+ * -----------------------------------------------------------------
+ */
+.cosmos-markdown pre code.hljs {
+  background: transparent !important;
+  padding: 0 !important;
+  font-size: 13px;
+  line-height: 1.6;
 }

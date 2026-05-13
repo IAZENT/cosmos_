@@ -7,7 +7,7 @@ import { RESOURCE_CATEGORIES } from '@/lib/content/categories'
 import {
   submitResourceAction,
   type PublicSubmitState,
-} from '@/app/admin/content-actions'
+} from '@/app/user2admin/content-actions'
 
 const INITIAL: PublicSubmitState = { error: null }
 

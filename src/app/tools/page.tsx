@@ -18,10 +18,10 @@ export default function ToolsPage() {
       <IntelStatusBar />
       <Navbar />
       <main>
-        <section className="px-6 pb-10 pt-16 md:px-12 md:pt-24">
+        <section className="px-4 pb-8 pt-10 sm:px-6 sm:pb-10 sm:pt-16 md:px-12 md:pt-24">
           <div className="cosmos-container">
             <SectionLabel>tooling</SectionLabel>
-            <h1 className="max-w-3xl text-[40px] leading-[1.05] tracking-[-0.02em] text-[var(--cosmos-text)] md:text-[56px]">
+            <h1 className="max-w-3xl text-[32px] leading-[1.05] tracking-[-0.02em] text-[var(--cosmos-text)] sm:text-[40px] md:text-[56px]">
               Client-side utilities.
             </h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-[var(--cosmos-text-muted)]">
@@ -31,7 +31,7 @@ export default function ToolsPage() {
           </div>
         </section>
 
-        <section className="px-6 pb-32 md:px-12">
+        <section className="px-4 pb-24 sm:px-6 sm:pb-32 md:px-12">
           <div className="cosmos-container">
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {TOOLS.map((t) => (

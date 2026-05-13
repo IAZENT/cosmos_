@@ -19,7 +19,6 @@ const COLUMNS: Column[] = [
       { label: 'Research', href: '/research' },
       { label: 'Resources', href: '/resources' },
       { label: 'Tools', href: '/tools' },
-      { label: 'Admin', href: '/admin' },
     ],
   },
   {
@@ -89,7 +88,7 @@ function ColumnList({ column }: { column: Column }) {
 export function Footer() {
   return (
     <footer className="border-t border-[var(--cosmos-border-dim)] bg-[var(--cosmos-bg)]">
-      <div className="mx-auto max-w-cosmos px-6 py-16 md:px-12">
+      <div className="mx-auto max-w-cosmos px-4 py-12 sm:px-6 sm:py-16 md:px-12">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           <div>
             <Link

@@ -1,7 +1,7 @@
 'use client'
 
 import useSWR from 'swr'
-import { UTCClock } from '@/components/home/UTCClock'
+import { NPTClock } from '@/components/home/NPTClock'
 import { formatRelative } from '@/lib/utils/date'
 import {
   EMPTY_STATS,
@@ -57,25 +57,34 @@ export function IntelStatusBar() {
 
   return (
     <div className="border-b border-[var(--cosmos-border-dim)] bg-[var(--cosmos-bg-elevated)]">
-      <div className="mx-auto flex h-8 max-w-cosmos items-center gap-3 px-6 md:px-12">
-        <span className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-dim)] sm:inline">
-          COSMOS INTELLIGENCE SYSTEM
-        </span>
-        <Sep />
-        <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-muted)]">
-          <Dot on={syncActive} />
-          NVD SYNC: {syncActive ? 'ACTIVE' : 'IDLE'}
-        </span>
-        <Sep />
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-muted)]">
-          KEV: {stats.kev_total.toLocaleString('en-US')} ENTRIES
-        </span>
-        <Sep />
-        <span className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-muted)] md:inline">
-          LAST SYNC: {formatRelative(stats.last_synced_at)}
-        </span>
-        <span className="ml-auto">
-          <UTCClock />
+      {/* On mobile the inner row needs to scroll horizontally to fit the
+       * sync/kev/clock chips; we anchor the UTC clock with a `min-w-0`
+       * outer flex so it never gets pushed off-screen. */}
+      <div className="mx-auto flex h-8 max-w-cosmos items-center gap-3 px-4 sm:px-6 md:px-12">
+        <div className="cosmos-scroll-x flex min-w-0 flex-1 items-center gap-3 whitespace-nowrap">
+          <span className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-dim)] sm:inline">
+            COSMOS INTELLIGENCE SYSTEM
+          </span>
+          <span className="hidden sm:inline">
+            <Sep />
+          </span>
+          <span className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-muted)]">
+            <Dot on={syncActive} />
+            NVD SYNC: {syncActive ? 'ACTIVE' : 'IDLE'}
+          </span>
+          <Sep />
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-muted)]">
+            KEV: {stats.kev_total.toLocaleString('en-US')} ENTRIES
+          </span>
+          <span className="hidden md:inline">
+            <Sep />
+          </span>
+          <span className="hidden font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-muted)] md:inline">
+            LAST SYNC: {formatRelative(stats.last_synced_at)}
+          </span>
+        </div>
+        <span className="shrink-0">
+          <NPTClock />
         </span>
       </div>
     </div>

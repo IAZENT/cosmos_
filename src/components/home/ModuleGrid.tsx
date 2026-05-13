@@ -54,7 +54,7 @@ const MODULES: ModuleDef[] = [
   {
     num: '05',
     title: 'Infrastructure',
-    href: '/admin',
+    href: '/user2admin',
     Icon: Server,
     blurb:
       'Operational surface: sync controls, content pipelines, platform telemetry.',

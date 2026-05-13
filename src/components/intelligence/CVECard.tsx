@@ -97,10 +97,10 @@ export function CVECard({
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={(e) => e.stopPropagation()}
-                className="inline-flex items-center gap-1.5 font-mono text-[11px] text-[var(--cosmos-text-muted)] hover:text-[var(--cosmos-text)]"
+                className="flex min-w-0 items-center gap-1.5 font-mono text-[11px] text-[var(--cosmos-text-muted)] hover:text-[var(--cosmos-text)]"
               >
-                <ExternalLink size={11} aria-hidden />
-                <span className="max-w-[32rem] truncate">{href}</span>
+                <ExternalLink size={11} aria-hidden className="shrink-0" />
+                <span className="min-w-0 flex-1 truncate">{href}</span>
               </a>
             </li>
           ))}

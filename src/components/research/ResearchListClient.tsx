@@ -102,11 +102,11 @@ export function ResearchListClient({
               {c}
             </button>
           ))}
-          <div className="ml-auto flex items-center gap-2">
+          <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
             <label htmlFor={searchId} className="sr-only">
               Search research
             </label>
-            <div className="flex items-center gap-2 rounded-[4px] border border-[var(--cosmos-border)] bg-[var(--cosmos-bg-subtle)] px-2.5 py-1.5">
+            <div className="flex flex-1 items-center gap-2 rounded-[4px] border border-[var(--cosmos-border)] bg-[var(--cosmos-bg-subtle)] px-2.5 py-1.5 sm:flex-none">
               <Search
                 size={12}
                 className="text-[var(--cosmos-text-dim)]"
@@ -118,7 +118,7 @@ export function ResearchListClient({
                 value={queryInput}
                 onChange={(e) => setQueryInput(e.target.value)}
                 placeholder="Full-text search…"
-                className="w-[16rem] bg-transparent font-mono text-[12px] text-[var(--cosmos-text)] placeholder:text-[var(--cosmos-text-dim)] focus:outline-none"
+                className="w-full bg-transparent font-mono text-[12px] text-[var(--cosmos-text)] placeholder:text-[var(--cosmos-text-dim)] focus:outline-none sm:w-[16rem]"
               />
               {queryInput ? (
                 <button
@@ -160,7 +160,7 @@ export function ResearchListClient({
           description={
             query.trim() || category !== 'ALL'
               ? 'Try a different category or clear the search.'
-              : 'Admins can author posts from /admin/research.'
+              : 'Admins can author posts from /user2admin/research.'
           }
         />
       ) : (

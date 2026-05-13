@@ -37,7 +37,7 @@ export function Navbar() {
       className="sticky top-0 z-40 border-b border-[var(--cosmos-border-dim)] bg-[var(--cosmos-bg)]/90 backdrop-blur"
       aria-label="Primary"
     >
-      <div className="mx-auto flex h-14 max-w-cosmos items-center justify-between px-6 md:px-12">
+      <div className="mx-auto flex h-14 max-w-cosmos items-center justify-between px-4 sm:px-6 md:px-12">
         <Link
           href="/"
           className="font-mono text-[14px] tracking-[0.04em] text-[var(--cosmos-text)] transition-colors hover:text-[var(--cosmos-accent)]"
@@ -75,7 +75,7 @@ export function Navbar() {
           aria-label={open ? 'Close menu' : 'Open menu'}
           aria-expanded={open}
           aria-controls="cosmos-mobile-menu"
-          className="flex h-10 w-10 items-center justify-center text-[var(--cosmos-text-muted)] md:hidden"
+          className="-mr-2 flex h-11 w-11 items-center justify-center text-[var(--cosmos-text-muted)] md:hidden"
           onClick={() => setOpen((v) => !v)}
         >
           {open ? <X size={18} /> : <Menu size={18} />}
@@ -88,7 +88,7 @@ export function Navbar() {
           className="border-t border-[var(--cosmos-border-dim)] md:hidden"
         >
           <nav
-            className="mx-auto flex max-w-cosmos flex-col gap-1 px-6 py-4"
+            className="mx-auto flex max-w-cosmos flex-col gap-1 px-4 py-4 sm:px-6"
             aria-label="Mobile"
           >
             {NAV_LINKS.map((link) => {

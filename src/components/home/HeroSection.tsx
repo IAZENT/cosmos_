@@ -1,5 +1,4 @@
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { HeroStats } from '@/components/home/HeroStats'
 import { getIntelStatsLive } from '@/lib/intel/server-data'
@@ -15,21 +14,21 @@ export async function HeroSection() {
   const stats = await getIntelStatsLive()
 
   return (
-    <section className="cosmos-section pt-[80px] md:pt-[120px]">
+    <section className="cosmos-section pt-12 sm:pt-20 md:pt-[120px]">
       <div className="cosmos-container">
         <SectionLabel>intelligence platform</SectionLabel>
 
-        <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-12">
           <div>
-            <h1 className="font-sans text-[64px] font-semibold leading-[0.95] tracking-[-0.02em] text-[var(--cosmos-text)] md:text-[96px]">
+            <h1 className="font-sans text-[48px] font-semibold leading-[0.95] tracking-[-0.02em] text-[var(--cosmos-text)] sm:text-[64px] md:text-[96px]">
               COSMOS
             </h1>
-            <p className="mt-6 max-w-xl text-[18px] leading-relaxed text-[var(--cosmos-text-muted)]">
+            <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-[var(--cosmos-text-muted)] sm:mt-6 sm:text-[18px]">
               Cybersecurity intelligence, research, and operational
               infrastructure.
             </p>
 
-            <div className="mt-[60px] flex flex-wrap gap-3">
+            <div className="mt-8 flex flex-wrap gap-2 sm:mt-10 sm:gap-3 md:mt-[60px]">
               {MODULES.map((m) => (
                 <Link
                   key={m.href}
@@ -44,15 +43,6 @@ export async function HeroSection() {
               ))}
             </div>
 
-            <div className="mt-12 flex flex-wrap items-center gap-3">
-              <Link href="/admin" className="cosmos-btn-primary">
-                <ArrowRight size={14} />
-                Enter Platform
-              </Link>
-              <Link href="/intelligence" className="cosmos-btn-ghost">
-                {'// View Intelligence'}
-              </Link>
-            </div>
           </div>
 
           <div className="md:pl-8">

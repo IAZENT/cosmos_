@@ -1,7 +1,7 @@
 'use client'
 
 import dynamic from 'next/dynamic'
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { ClipboardEvent, ComponentProps } from 'react'
 import { AlertTriangle, FileUp, Loader2 } from 'lucide-react'
 
@@ -32,6 +32,19 @@ export function MarkdownEditor({
   const [includeImages, setIncludeImages] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const fileRef = useRef<HTMLInputElement>(null)
+
+  // The split "live" preview is unusable below ~768 px  the editor
+  // and preview panes each get less than a phone-width column. Watch
+  // the viewport and drop to "edit" mode under the md breakpoint.
+  const [preview, setPreview] = useState<'live' | 'edit'>('live')
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const mq = window.matchMedia('(min-width: 768px)')
+    const sync = () => setPreview(mq.matches ? 'live' : 'edit')
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
 
   // Insert text at the current selection (or append). The MD editor's
   // textarea is the active element while editing; for the import-button
@@ -162,7 +175,7 @@ export function MarkdownEditor({
           value={value}
           onChange={(v) => setValue(v ?? '')}
           height={rows * 24}
-          preview="live"
+          preview={preview}
           visibleDragbar={false}
           textareaProps={{
             placeholder:

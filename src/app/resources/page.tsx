@@ -22,11 +22,11 @@ export default async function ResourcesPage() {
       <IntelStatusBar />
       <Navbar />
       <main>
-        <section className="px-6 pb-10 pt-16 md:px-12 md:pt-24">
+        <section className="px-4 pb-8 pt-10 sm:px-6 sm:pb-10 sm:pt-16 md:px-12 md:pt-24">
           <div className="cosmos-container">
             <SectionLabel>resource network</SectionLabel>
             <div className="flex flex-wrap items-end justify-between gap-6">
-              <h1 className="max-w-3xl text-[40px] leading-[1.05] tracking-[-0.02em] text-[var(--cosmos-text)] md:text-[56px]">
+              <h1 className="max-w-3xl text-[32px] leading-[1.05] tracking-[-0.02em] text-[var(--cosmos-text)] sm:text-[40px] md:text-[56px]">
                 Curated intelligence, tooling, and learning references.
               </h1>
               <Link
@@ -42,7 +42,7 @@ export default async function ResourcesPage() {
             </p>
           </div>
         </section>
-        <section className="px-6 pb-32 md:px-12">
+        <section className="px-4 pb-24 sm:px-6 sm:pb-32 md:px-12">
           <div className="cosmos-container">
             <ResourcesClient initialItems={items} />
           </div>

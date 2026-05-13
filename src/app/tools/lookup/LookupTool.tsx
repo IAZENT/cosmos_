@@ -246,8 +246,8 @@ function Results({ data }: { data: LookupResponse }) {
                 kind: {KIND_LABEL[data.kind]}
               </span>
             </div>
-            <div className="flex items-center gap-2 font-mono text-[12px] text-[var(--cosmos-text)]">
-              <span className="truncate">{data.normalized}</span>
+            <div className="flex items-start gap-2 font-mono text-[12px] text-[var(--cosmos-text)]">
+              <span className="min-w-0 flex-1 break-all">{data.normalized}</span>
               <CopyButton value={data.normalized} />
             </div>
             {data.overall.reasons.length > 0 ? (
@@ -370,7 +370,7 @@ function FieldRow({ field }: { field: ReportField }) {
       </dt>
       <dd
         className={cn(
-          'truncate text-[12px] text-[var(--cosmos-text)]',
+          'min-w-0 break-words text-[12px] text-[var(--cosmos-text)]',
           field.mono !== false ? 'font-mono' : '',
         )}
         title={String(field.value)}

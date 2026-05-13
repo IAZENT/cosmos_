@@ -40,15 +40,22 @@ export default function HomePage() {
 }
 
 function HeroSkeleton() {
+  // Matches the real HeroSection layout: wordmark + tagline + 4 module
+  // chips on the left, three stat counters on the right.
   return (
-    <section className="cosmos-section pt-[80px] md:pt-[120px]">
+    <section className="cosmos-section pt-12 sm:pt-20 md:pt-[120px]">
       <div className="cosmos-container">
-        <div className="grid grid-cols-1 items-start gap-12 md:grid-cols-[minmax(0,1fr)_auto]">
+        <div className="grid grid-cols-1 items-start gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-12">
           <div>
-            <LoadingSkeleton className="h-[64px] w-[280px] md:h-[96px] md:w-[420px]" />
-            <LoadingSkeleton className="mt-6 h-5 w-2/3 max-w-xl" />
+            <LoadingSkeleton className="h-[48px] w-[220px] sm:h-[64px] sm:w-[280px] md:h-[96px] md:w-[420px]" />
+            <LoadingSkeleton className="mt-4 h-4 w-2/3 max-w-xl sm:mt-6 sm:h-5" />
+            <div className="mt-8 flex flex-wrap gap-2 sm:mt-10 sm:gap-3 md:mt-[60px]">
+              {Array.from({ length: 4 }).map((_, i) => (
+                <LoadingSkeleton key={i} className="h-9 w-32" />
+              ))}
+            </div>
           </div>
-          <div className="flex flex-col gap-6 md:items-end">
+          <div className="flex flex-col gap-6 md:items-end md:pl-8">
             <LoadingSkeleton className="h-10 w-40" />
             <LoadingSkeleton className="h-10 w-32" />
             <LoadingSkeleton className="h-10 w-32" />

@@ -39,7 +39,7 @@ export default async function ResearchDetailPage({
       <IntelStatusBar />
       <Navbar />
       <main>
-        <article className="px-6 pb-24 pt-12 md:px-12 md:pt-16">
+        <article className="px-4 pb-16 pt-8 sm:px-6 sm:pb-24 sm:pt-12 md:px-12 md:pt-16">
           <div className="cosmos-container max-w-3xl">
             <Link
               href="/research"
@@ -51,7 +51,7 @@ export default async function ResearchDetailPage({
             <SectionLabel className="mt-8">
               {(post.category ?? 'research').toLowerCase()}
             </SectionLabel>
-            <h1 className="text-[40px] leading-[1.05] tracking-[-0.02em] text-[var(--cosmos-text)] md:text-[52px]">
+            <h1 className="text-[32px] leading-[1.05] tracking-[-0.02em] text-[var(--cosmos-text)] sm:text-[40px] md:text-[52px]">
               {post.title}
             </h1>
             {post.summary ? (

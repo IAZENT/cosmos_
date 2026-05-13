@@ -120,7 +120,7 @@ export function ResourcesClient({
           }
           description={
             initialItems.length === 0
-              ? 'Admins can add entries from /admin/resources.'
+              ? 'Admins can add entries from /user2admin/resources.'
               : 'Try a different category or clear the search.'
           }
         />

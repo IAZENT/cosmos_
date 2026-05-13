@@ -82,11 +82,11 @@ export function CVEFilters({
           KEV only
         </label>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="flex w-full items-center gap-2 sm:ml-auto sm:w-auto">
           <label htmlFor={searchId} className="sr-only">
             Search CVEs
           </label>
-          <div className="flex items-center gap-2 rounded-[4px] border border-[var(--cosmos-border)] bg-[var(--cosmos-bg-subtle)] px-2.5 py-1.5">
+          <div className="flex flex-1 items-center gap-2 rounded-[4px] border border-[var(--cosmos-border)] bg-[var(--cosmos-bg-subtle)] px-2.5 py-1.5 sm:flex-none">
             <Search
               size={12}
               className="text-[var(--cosmos-text-dim)]"
@@ -100,7 +100,7 @@ export function CVEFilters({
               onChange={(e) =>
                 onChange({ ...state, search: e.target.value })
               }
-              className="w-[14rem] bg-transparent font-mono text-[12px] text-[var(--cosmos-text)] placeholder:text-[var(--cosmos-text-dim)] focus:outline-none"
+              className="w-full bg-transparent font-mono text-[12px] text-[var(--cosmos-text)] placeholder:text-[var(--cosmos-text-dim)] focus:outline-none sm:w-[14rem]"
             />
           </div>
         </div>

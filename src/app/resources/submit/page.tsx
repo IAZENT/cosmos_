@@ -28,7 +28,7 @@ export default function SubmitResourcePage() {
               <ChevronLeft size={12} aria-hidden /> Back to resources
             </Link>
             <SectionLabel className="mt-6">submit a resource</SectionLabel>
-            <h1 className="text-[40px] leading-[1.05] tracking-[-0.02em] text-[var(--cosmos-text)] md:text-[48px]">
+            <h1 className="text-[32px] leading-[1.05] tracking-[-0.02em] text-[var(--cosmos-text)] sm:text-[40px] md:text-[48px]">
               Suggest a link.
             </h1>
             <p className="mt-4 max-w-2xl text-[15px] leading-relaxed text-[var(--cosmos-text-muted)]">

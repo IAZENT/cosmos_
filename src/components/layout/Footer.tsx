@@ -15,19 +15,13 @@ const COLUMNS: Column[] = [
   {
     title: 'Platform',
     links: [
+      { label: 'Home', href: '/' },
       { label: 'Intelligence', href: '/intelligence' },
+      { label: 'News', href: '/news' },
+      { label: 'Scholarships', href: '/scholarships' },
       { label: 'Research', href: '/research' },
       { label: 'Resources', href: '/resources' },
       { label: 'Tools', href: '/tools' },
-    ],
-  },
-  {
-    title: 'Research',
-    links: [
-      { label: 'Writeups', href: '/research' },
-      { label: 'Malware', href: '/research?category=malware' },
-      { label: 'DFIR', href: '/research?category=dfir' },
-      { label: 'RE Notes', href: '/research?category=re' },
     ],
   },
   {
@@ -52,36 +46,45 @@ const COLUMNS: Column[] = [
   },
 ]
 
+function FooterLink({ link }: { link: LinkDef }) {
+  const className =
+    'inline-block font-mono text-[12px] leading-[1.6] text-[var(--cosmos-text-muted)] transition-colors hover:text-[var(--cosmos-text)] focus-visible:text-[var(--cosmos-text)] focus-visible:outline-none focus-visible:underline focus-visible:underline-offset-4'
+  if (link.external) {
+    return (
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={className}
+      >
+        {link.label}
+      </a>
+    )
+  }
+  return (
+    <Link href={link.href} prefetch={false} className={className}>
+      {link.label}
+    </Link>
+  )
+}
+
 function ColumnList({ column }: { column: Column }) {
   return (
-    <div>
-      <h3 className="mb-4 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--cosmos-text-dim)]">
+    <section aria-labelledby={`footer-col-${column.title.toLowerCase()}`}>
+      <h3
+        id={`footer-col-${column.title.toLowerCase()}`}
+        className="mb-4 font-mono text-[11px] uppercase tracking-[0.12em] text-[var(--cosmos-text-dim)]"
+      >
         {column.title}
       </h3>
       <ul className="flex flex-col gap-2">
         {column.links.map((link) => (
           <li key={`${column.title}-${link.href}`}>
-            {link.external ? (
-              <a
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="font-mono text-[12px] text-[var(--cosmos-text-muted)] transition-colors hover:text-[var(--cosmos-text)]"
-              >
-                {link.label}
-              </a>
-            ) : (
-              <Link
-                href={link.href}
-                className="font-mono text-[12px] text-[var(--cosmos-text-muted)] transition-colors hover:text-[var(--cosmos-text)]"
-              >
-                {link.label}
-              </Link>
-            )}
+            <FooterLink link={link} />
           </li>
         ))}
       </ul>
-    </div>
+    </section>
   )
 }
 
@@ -89,11 +92,24 @@ export function Footer() {
   return (
     <footer className="border-t border-[var(--cosmos-border-dim)] bg-[var(--cosmos-bg)]">
       <div className="mx-auto max-w-cosmos px-4 py-12 sm:px-6 sm:py-16 md:px-12">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
-          <div>
+        {/*
+         * Adaptive grid: `auto-fit` with a minimum column width of
+         * 180px makes the layout flow purely on available space  on
+         * a wide window all four cells sit in one row, on a narrow
+         * tablet they wrap to 2x2, and on a phone they collapse to a
+         * single vertical stack. This adapts to *container* width,
+         * not just viewport width, so the footer also reflows
+         * correctly inside any embedded contexts.
+         */}
+        <div
+          className="grid gap-x-8 gap-y-10"
+          style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(180px, 1fr))' }}
+        >
+          <div className="min-w-0">
             <Link
               href="/"
-              className="font-mono text-[14px] text-[var(--cosmos-text)]"
+              prefetch={false}
+              className="inline-block font-mono text-[14px] tracking-[0.04em] text-[var(--cosmos-text)] transition-colors hover:text-[var(--cosmos-accent)]"
             >
               ./cosmos
             </Link>
@@ -107,7 +123,7 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-16 flex flex-col items-start justify-between gap-3 border-t border-[var(--cosmos-border-dim)] pt-6 md:flex-row md:items-center">
+        <div className="mt-12 flex flex-wrap items-center justify-between gap-x-6 gap-y-3 border-t border-[var(--cosmos-border-dim)] pt-6 sm:mt-16">
           <span className="font-mono text-[11px] text-[var(--cosmos-text-dim)]">
             © {new Date().getUTCFullYear()} COSMOS. Built in public.
           </span>

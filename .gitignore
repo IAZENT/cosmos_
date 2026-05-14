@@ -36,5 +36,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# docs  only README tracked
+*.md
+!README.md
 
-*md
+

@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { GeistSans } from 'geist/font/sans'
 import { GeistMono } from 'geist/font/mono'
-import { CommandPalette } from '@/components/layout/CommandPalette'
+import { CommandPaletteMount } from '@/components/layout/CommandPaletteMount'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -38,7 +38,7 @@ export default function RootLayout({
     >
       <body className="bg-[var(--cosmos-bg)] text-[var(--cosmos-text)] font-sans antialiased">
         {children}
-        <CommandPalette />
+        <CommandPaletteMount />
       </body>
     </html>
   )

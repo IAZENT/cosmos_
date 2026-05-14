@@ -1,7 +1,7 @@
 'use client'
 
-import useSWRInfinite from 'swr/infinite'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import useSWR from 'swr'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { ScholarshipCard } from '@/components/scholarships/ScholarshipCard'
 import {
   ScholarshipFilters,
@@ -10,6 +10,7 @@ import {
 } from '@/components/scholarships/ScholarshipFilters'
 import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Pagination } from '@/components/ui/Pagination'
 import type { ScholarshipFeedResponse } from '@/app/api/scholarships/route'
 
 const PAGE_SIZE = 20
@@ -20,15 +21,13 @@ const fetcher = async (url: string): Promise<ScholarshipFeedResponse> => {
   return res.json()
 }
 
-function buildKey(
-  index: number,
-  prev: ScholarshipFeedResponse | null,
+function buildQuery(
   filters: ScholarshipFilterState,
-): string | null {
-  if (prev && prev.items.length === 0 && index > 0) return null
+  offset: number,
+): string {
   const params = new URLSearchParams({
     limit: String(PAGE_SIZE),
-    offset: String(index * PAGE_SIZE),
+    offset: String(offset),
   })
   if (filters.country !== 'ALL') params.set('country', filters.country)
   if (filters.level !== 'ALL') params.set('level', filters.level)
@@ -41,6 +40,7 @@ export function ScholarshipFeed() {
   const [filters, setFilters] = useState<ScholarshipFilterState>(
     DEFAULT_SCHOLARSHIP_FILTERS,
   )
+  const [page, setPage] = useState(1)
 
   // Debounce search input so each keystroke doesn't trigger a fetch.
   const [debounced, setDebounced] = useState(filters)
@@ -49,52 +49,59 @@ export function ScholarshipFeed() {
     return () => window.clearTimeout(t)
   }, [filters])
 
-  const getKey = useCallback(
-    (index: number, previous: ScholarshipFeedResponse | null) =>
-      buildKey(index, previous, debounced),
-    [debounced],
+  // Reset to page 1 + sticky total when filters change. Using the
+  // React-canonical "set state during render" pattern so the reset
+  // converges on the next render with no intermediate flicker.
+  const [trackedFilters, setTrackedFilters] = useState(debounced)
+  const [stickyTotal, setStickyTotal] = useState(0)
+  if (trackedFilters !== debounced) {
+    setTrackedFilters(debounced)
+    setPage(1)
+    setStickyTotal(0)
+  }
+
+  const apiUrl = useMemo(
+    () => buildQuery(debounced, (page - 1) * PAGE_SIZE),
+    [debounced, page],
   )
 
-  const { data, error, size, setSize, isValidating } =
-    useSWRInfinite<ScholarshipFeedResponse>(getKey, fetcher, {
-      revalidateFirstPage: false,
+  const { data, error, isValidating } = useSWR<ScholarshipFeedResponse>(
+    apiUrl,
+    fetcher,
+    {
       revalidateOnFocus: false,
-    })
+      revalidateIfStale: false,
+      keepPreviousData: true,
+    },
+  )
 
-  const pages = useMemo(() => data ?? [], [data])
-  const items = useMemo(() => pages.flatMap((p) => p.items), [pages])
-  const total = pages[0]?.total ?? 0
-  const configured = pages[0]?.configured ?? true
-  const hasMore = items.length < total
+  // Keep the largest known total across pages: deeper pages may not
+  // include an exact count and we don't want the UI to flicker.
+  const incomingTotal = data?.total ?? 0
+  if (incomingTotal > stickyTotal) setStickyTotal(incomingTotal)
+  const total = Math.max(stickyTotal, incomingTotal)
+  const configured = data?.configured ?? true
+  const items = data?.items ?? []
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   const initialLoading = !data && !error
-  const loadingMore =
-    size > pages.length && pages.length > 0 && isValidating
+  const refiltering = !!data && isValidating
 
-  const handleReset = useCallback(() => {
+  const handleReset = () => {
     setFilters(DEFAULT_SCHOLARSHIP_FILTERS)
-  }, [])
+    setPage(1)
+    setStickyTotal(0)
+  }
 
-  // Infinite-scroll sentinel: load the next page once it's near the
-  // viewport. Manual button below as a fallback for keyboard users.
-  const sentinelRef = useRef<HTMLDivElement | null>(null)
+  // Scroll back to the filters card on page change so users land at the
+  // top of the new page instead of mid-list.
+  const topRef = useRef<HTMLDivElement | null>(null)
   useEffect(() => {
-    if (!hasMore || loadingMore) return
-    const node = sentinelRef.current
-    if (!node) return
-    const obs = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((e) => e.isIntersecting)) {
-          void setSize((s) => s + 1)
-        }
-      },
-      { rootMargin: '600px 0px' },
-    )
-    obs.observe(node)
-    return () => obs.disconnect()
-  }, [hasMore, loadingMore, setSize])
+    if (page === 1) return
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [page])
 
   return (
-    <div className="flex flex-col gap-4">
+    <div ref={topRef} className="flex flex-col gap-4 scroll-mt-24">
       <ScholarshipFilters
         state={filters}
         onChange={setFilters}
@@ -105,10 +112,14 @@ export function ScholarshipFeed() {
         <span>
           {`// ${total.toLocaleString('en-US')} result${total === 1 ? '' : 's'}`}
         </span>
-        <span>
+        <span className={refiltering ? 'animate-pulse' : ''}>
           {initialLoading
             ? 'loading…'
-            : `showing ${items.length}`}
+            : refiltering
+              ? 'updating…'
+              : totalPages > 1
+                ? `page ${page} / ${totalPages}`
+                : `showing ${items.length}`}
         </span>
       </div>
 
@@ -143,23 +154,19 @@ export function ScholarshipFeed() {
       {items.length > 0 ? (
         <div className="grid grid-cols-1 gap-3">
           {items.map((row) => (
-            <ScholarshipCard key={row.id} row={row} />
+            <div key={row.id} className="cosmos-virtual-row">
+              <ScholarshipCard row={row} />
+            </div>
           ))}
         </div>
       ) : null}
 
-      {hasMore ? (
-        <div ref={sentinelRef} className="flex justify-center pt-4">
-          <button
-            type="button"
-            onClick={() => void setSize((s) => s + 1)}
-            disabled={loadingMore}
-            className="cosmos-btn-ghost disabled:opacity-60"
-          >
-            {loadingMore ? 'Loading…' : 'Load more'}
-          </button>
-        </div>
-      ) : null}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onChange={setPage}
+        disabled={isValidating && !data}
+      />
     </div>
   )
 }

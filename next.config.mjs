@@ -35,11 +35,42 @@ const nextConfig = {
   poweredByHeader: false,
   compress: true,
   productionBrowserSourceMaps: false,
+  // Tree-shake big icon / date packages so per-route bundles only
+  // ship the names the route actually imports. Without this Next
+  // hoists every named import through a barrel, defeating ESM
+  // sideEffects: false.
+  experimental: {
+    optimizePackageImports: [
+      'lucide-react',
+      'date-fns',
+      'cmdk',
+    ],
+  },
+  // next/image config: AVIF/WebP first, long-lived edge cache. We
+  // host research/cve OG images and screenshots; remoteImages stays
+  // empty since everything is same-origin or data URI.
+  images: {
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60 * 60 * 24 * 7, // 7 days
+    deviceSizes: [360, 640, 768, 1024, 1280, 1600],
+    imageSizes: [16, 24, 32, 48, 64, 96, 128, 256],
+  },
   async headers() {
     return [
       {
         source: '/:path*',
         headers: securityHeaders,
+      },
+      // Aggressively cache hashed static assets  Next already
+      // fingerprints filenames, so a 1-year immutable header is safe.
+      {
+        source: '/_next/static/:path*',
+        headers: [
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
       },
     ]
   },

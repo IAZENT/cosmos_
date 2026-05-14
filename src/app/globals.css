@@ -145,6 +145,33 @@ select {
 }
 
 /* -----------------------------------------------------------------
+ * Performance: content-visibility lets the browser skip layout +
+ * paint for off-screen list items. We anchor a contain-intrinsic-size
+ * close to the real card height so the scrollbar doesn't jitter while
+ * the engine streams items in. Apply via the `cosmos-virtual-row`
+ * class on each list <li> / wrapper.
+ * -----------------------------------------------------------------
+ */
+.cosmos-virtual-row {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 180px;
+}
+
+/* Respect prefers-reduced-motion: disable the threat-ticker scroll,
+ * the palette ping, and any other infinite animations for users who
+ * have requested reduced motion at the OS level. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* -----------------------------------------------------------------
  * cmdk command-palette skin
  * -----------------------------------------------------------------
  */

@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import useSWR from 'swr'
 import { NPTClock } from '@/components/home/NPTClock'
 import { ThreatVelocity } from '@/components/home/ThreatVelocity'
@@ -12,6 +13,29 @@ import {
   EMPTY_VELOCITY,
   type ThreatVelocity as ThreatVelocityData,
 } from '@/lib/intel/server-data-types'
+
+function useIdleKey(key: string) {
+  const [idle, setIdle] = useState(false)
+  useEffect(() => {
+    let cancelled = false
+    const activate = () => {
+      if (!cancelled) setIdle(true)
+    }
+    if ('requestIdleCallback' in window) {
+      const id = requestIdleCallback(activate, { timeout: 2_000 })
+      return () => {
+        cancelled = true
+        cancelIdleCallback(id)
+      }
+    }
+    const id = setTimeout(activate, 0)
+    return () => {
+      cancelled = true
+      clearTimeout(id)
+    }
+  }, [])
+  return idle ? key : null
+}
 
 function Dot({ on }: { on: boolean }) {
   return (
@@ -63,8 +87,9 @@ export function IntelStatusBar() {
   // Probe velocity directly here so the parent bar can render the
   // "// ELEVATED THREAT ACTIVITY" banner. The <ThreatVelocity /> child
   // dedupes against this same SWR key.
+  const velocityKey = useIdleKey('/api/intelligence/velocity')
   const { data: velocity } = useSWR<ThreatVelocityData>(
-    '/api/intelligence/velocity',
+    velocityKey,
     async (url: string) => {
       const res = await fetch(url)
       if (!res.ok) throw new Error(`velocity ${res.status}`)

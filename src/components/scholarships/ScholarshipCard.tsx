@@ -1,5 +1,6 @@
 'use client'
 
+import { memo } from 'react'
 import { ExternalLink } from 'lucide-react'
 import { CosmosCard } from '@/components/ui/CosmosCard'
 import { formatRelative } from '@/lib/utils/date'
@@ -21,7 +22,7 @@ const FUNDING_LABEL: Record<string, string> = {
   UNKNOWN: 'funding unspecified',
 }
 
-export function ScholarshipCard({ row }: { row: ScholarshipNewsRow }) {
+function ScholarshipCardImpl({ row }: { row: ScholarshipNewsRow }) {
   const flags = (row.countries.length > 0 ? row.countries : ['Other'])
     .slice(0, 3)
     .map((c) => FLAG_BY_COUNTRY[c as ScholarshipCountry] ?? '🌍')
@@ -106,3 +107,8 @@ export function ScholarshipCard({ row }: { row: ScholarshipNewsRow }) {
     </CosmosCard>
   )
 }
+
+// Reference equality is enough  parent feeds always pass stable rows
+// straight from SWR cache, so a shallow memo skips render of unchanged
+// list items when the page or selection state changes around them.
+export const ScholarshipCard = memo(ScholarshipCardImpl)

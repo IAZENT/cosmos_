@@ -77,6 +77,7 @@ export function Navbar() {
       <div className="mx-auto flex h-14 max-w-cosmos items-center justify-between px-4 sm:px-6 md:px-12">
         <Link
           href="/"
+          prefetch={false}
           className="font-mono text-[14px] tracking-[0.04em] text-[var(--cosmos-text)] transition-colors hover:text-[var(--cosmos-accent)]"
         >
           ./cosmos
@@ -90,6 +91,7 @@ export function Navbar() {
               <Link
                 key={link.href}
                 href={link.href}
+                prefetch={false}
                 className={cn(
                   'font-mono text-[12px] uppercase tracking-[0.08em] transition-colors',
                   active
@@ -136,6 +138,7 @@ export function Navbar() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  prefetch={false}
                   onClick={() => setOpen(false)}
                   className={cn(
                     'py-2 font-mono text-[12px] uppercase tracking-[0.08em]',

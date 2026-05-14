@@ -2,7 +2,7 @@
 
 import { Check, Copy, ExternalLink, Link2 } from 'lucide-react'
 import Link from 'next/link'
-import { useState } from 'react'
+import { memo, useState } from 'react'
 import { CosmosCard } from '@/components/ui/CosmosCard'
 import { SeverityBadge } from '@/components/ui/SeverityBadge'
 import { formatRelative } from '@/lib/utils/date'
@@ -21,7 +21,7 @@ function safeReferences(raw: unknown): string[] {
   return []
 }
 
-export function CVECard({
+function CVECardImpl({
   cve,
   onSelect,
 }: {
@@ -160,3 +160,11 @@ export function CVECard({
     </CosmosCard>
   )
 }
+
+/**
+ * Memoised so selecting a CVE (which updates parent state) doesn't
+ * re-render every other card in the 20-row page. `cve` rows from SWR
+ * are reference-stable across renders, and the parent passes a stable
+ * `onSelect` setter, so a default shallow compare is sufficient.
+ */
+export const CVECard = memo(CVECardImpl)

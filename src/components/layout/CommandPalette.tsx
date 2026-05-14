@@ -54,8 +54,15 @@ function kindIcon(kind: SearchHit['kind']) {
  * Search is debounced to 150 ms; payload is fetched via SWR so repeated
  * opens of the palette reuse the cached query.
  */
-export function CommandPalette() {
-  const [open, setOpen] = useState(false)
+export function CommandPalette({
+  initialOpen = false,
+}: {
+  /** Open the palette on first mount. Set by the lazy mount wrapper
+   *  when the user has already pressed the trigger before the bundle
+   *  finished loading, so the keypress isn't wasted. */
+  initialOpen?: boolean
+}) {
+  const [open, setOpen] = useState(initialOpen)
   const [input, setInput] = useState('')
   const [debounced, setDebounced] = useState('')
   const router = useRouter()

@@ -1,7 +1,7 @@
 'use client'
 
-import useSWRInfinite from 'swr/infinite'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import useSWR from 'swr'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { CVECard } from '@/components/intelligence/CVECard'
 import {
   CVEFilters,
@@ -12,6 +12,7 @@ import { CVEDetailModal } from '@/components/intelligence/CVEDetailModal'
 import { SaveSearchButton } from '@/components/intelligence/SaveSearchButton'
 import { LoadingSkeleton } from '@/components/ui/LoadingSkeleton'
 import { EmptyState } from '@/components/ui/EmptyState'
+import { Pagination } from '@/components/ui/Pagination'
 import type { SavedSearchFilters } from '@/types/saved-search'
 import type {
   CVEFeedResponse,
@@ -45,6 +46,7 @@ function buildQuery(filters: CVEFilterState, offset: number): string {
 export function CVEFeed() {
   const [filters, setFilters] = useState<CVEFilterState>(DEFAULT_FILTER_STATE)
   const [selected, setSelected] = useState<CVEFeedRow | null>(null)
+  const [page, setPage] = useState(1)
 
   // Debounce the search input so we don't spam the API on every keystroke.
   const [debouncedSearch, setDebouncedSearch] = useState(filters.search)
@@ -57,68 +59,66 @@ export function CVEFeed() {
     [filters, debouncedSearch],
   )
 
-  const getKey = useCallback(
-    (index: number, prev: CVEFeedResponse | null) => {
-      if (prev && prev.items.length < PAGE_SIZE) return null
-      return buildQuery(effectiveFilters, index * PAGE_SIZE)
-    },
-    [effectiveFilters],
+  // Reset to page 1 + sticky total whenever the active filters change.
+  // Using the React-canonical "set state during render" pattern so
+  // these resets converge on the very next render rather than after an
+  // intermediate one (which would briefly show the wrong page/total).
+  const [trackedFilters, setTrackedFilters] = useState(effectiveFilters)
+  const [stickyTotal, setStickyTotal] = useState(0)
+  if (trackedFilters !== effectiveFilters) {
+    setTrackedFilters(effectiveFilters)
+    setPage(1)
+    setStickyTotal(0)
+  }
+
+  const apiUrl = useMemo(
+    () => buildQuery(effectiveFilters, (page - 1) * PAGE_SIZE),
+    [effectiveFilters, page],
   )
 
-  const { data, error, isValidating, size, setSize, mutate } =
-    useSWRInfinite<CVEFeedResponse>(getKey, fetcher, {
-      revalidateFirstPage: false,
+  const { data, error, isValidating, mutate } = useSWR<CVEFeedResponse>(
+    apiUrl,
+    fetcher,
+    {
       revalidateOnFocus: false,
       revalidateIfStale: false,
       keepPreviousData: true,
       dedupingInterval: 5_000,
-    })
+    },
+  )
 
-  const pages = data ?? []
-  const items = pages.flatMap((p) => p.items)
-  // Some pages (paged fetches) don't carry a count; surface the largest
-  // total we've seen so the UI doesn't shrink while paginating.
-  const total = pages.reduce((max, p) => Math.max(max, p.total ?? 0), 0)
-  const hasMore =
-    items.length < total ||
-    (pages.length > 0 && pages[pages.length - 1]!.items.length === PAGE_SIZE)
-  const loadingMore = isValidating && pages.length > 0 && !data?.[size - 1]
+  // Cache the largest total we've seen across pages: the API only returns
+  // an exact count on offset=0, so deeper pages would otherwise flicker
+  // between the real total and 0.
+  const incomingTotal = data?.total ?? 0
+  if (incomingTotal > stickyTotal) setStickyTotal(incomingTotal)
+  const total = Math.max(stickyTotal, incomingTotal)
+
+  const items = data?.items ?? []
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE))
   const initialLoading = !data && !error
-  const refiltering = !!data && isValidating && size === 1
+  const refiltering = !!data && isValidating
 
   const handleReset = () => {
     setFilters(DEFAULT_FILTER_STATE)
     setDebouncedSearch('')
-    setSize(1)
+    setPage(1)
+    setStickyTotal(0)
     void mutate()
   }
 
-  // Reset pagination when filters change.
+  // Scroll the feed back to its top whenever the page changes so users
+  // aren't dropped into the middle of the new page after clicking "next".
+  // We anchor on the filters card, not window-scroll, to avoid jumping
+  // past navbar/intel-status bar.
+  const topRef = useRef<HTMLDivElement | null>(null)
   useEffect(() => {
-    setSize(1)
-  }, [effectiveFilters, setSize])
-
-  // Auto-load the next page when the sentinel scrolls into view. Falls back
-  // gracefully on browsers without IntersectionObserver  the explicit
-  // "Load more" button below remains as a manual trigger.
-  const sentinelRef = useRef<HTMLDivElement | null>(null)
-  useEffect(() => {
-    const node = sentinelRef.current
-    if (!node || typeof IntersectionObserver === 'undefined') return
-    if (!hasMore || loadingMore || isValidating) return
-    const obs = new IntersectionObserver(
-      (entries) => {
-        const entry = entries[0]
-        if (entry?.isIntersecting) setSize((s) => s + 1)
-      },
-      { rootMargin: '600px 0px' },
-    )
-    obs.observe(node)
-    return () => obs.disconnect()
-  }, [hasMore, loadingMore, isValidating, setSize])
+    if (page === 1) return
+    topRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, [page])
 
   return (
-    <div className="flex flex-col gap-4">
+    <div ref={topRef} className="flex flex-col gap-4 scroll-mt-24">
       <CVEFilters
         state={filters}
         onChange={setFilters}
@@ -134,7 +134,11 @@ export function CVEFeed() {
             filters={effectiveFilters satisfies SavedSearchFilters}
           />
           <span className={refiltering ? 'animate-pulse' : ''}>
-            {refiltering ? 'updating…' : `showing ${items.length}`}
+            {refiltering
+              ? 'updating…'
+              : totalPages > 1
+                ? `page ${page} / ${totalPages}`
+                : `showing ${items.length}`}
           </span>
         </div>
       </div>
@@ -165,24 +169,18 @@ export function CVEFeed() {
 
       <div className="grid grid-cols-1 gap-3">
         {items.map((cve) => (
-          <CVECard key={cve.id} cve={cve} onSelect={setSelected} />
+          <div key={cve.id} className="cosmos-virtual-row">
+            <CVECard cve={cve} onSelect={setSelected} />
+          </div>
         ))}
       </div>
 
-      {hasMore ? (
-        <>
-          {/* Sentinel watched by IntersectionObserver for auto-pagination. */}
-          <div ref={sentinelRef} aria-hidden className="h-px w-full" />
-          <button
-            type="button"
-            onClick={() => setSize(size + 1)}
-            disabled={loadingMore}
-            className="cosmos-btn-ghost mx-auto mt-6 disabled:opacity-60"
-          >
-            {loadingMore ? 'loading…' : '→ Load more'}
-          </button>
-        </>
-      ) : null}
+      <Pagination
+        page={page}
+        totalPages={totalPages}
+        onChange={setPage}
+        disabled={isValidating && !data}
+      />
 
       <CVEDetailModal cve={selected} onClose={() => setSelected(null)} />
     </div>

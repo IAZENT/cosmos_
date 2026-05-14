@@ -6,7 +6,7 @@ import { z } from 'zod'
 //   POST /api/tools/urlscan          → submit a URL for scanning, returns { uuid, resultUrl }
 //   GET  /api/tools/urlscan?uuid=... → poll for a finished result
 //
-// urlscan.io scans are async — submit takes ~1s, but the verdict
+// urlscan.io scans are async  submit takes ~1s, but the verdict
 // usually needs another 5–15s to render. The browser polls.
 
 export const runtime = 'nodejs'
@@ -117,7 +117,7 @@ export async function GET(request: Request) {
     const res = await fetch(`https://urlscan.io/api/v1/result/${uuid}/`, {
       headers: { 'API-Key': apiKey },
     })
-    // 404 is the "not ready yet" signal — keep polling on the client.
+    // 404 is the "not ready yet" signal  keep polling on the client.
     if (res.status === 404) {
       return NextResponse.json({ status: 'pending' }, { status: 200 })
     }

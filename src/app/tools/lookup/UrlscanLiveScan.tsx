@@ -12,7 +12,7 @@ import { cn } from '@/lib/utils/cn'
 
 // Inline live-scan flow: POST the URL to urlscan.io via our proxy,
 // then poll until the verdict is ready. Same backend as the standalone
-// tool (which we removed) — just embedded directly into the URL card
+// tool (which we removed)  just embedded directly into the URL card
 // of the unified lookup result.
 
 type LiveResult = {

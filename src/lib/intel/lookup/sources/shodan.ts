@@ -1,6 +1,6 @@
 // Shodan connector. Two endpoints used:
-//   /shodan/host/{ip}        — banners + services
-//   /dns/resolve?hostnames=  — domain → IP, used for domain lookups
+//   /shodan/host/{ip}         banners + services
+//   /dns/resolve?hostnames=   domain → IP, used for domain lookups
 //
 // We don't reach for `/shodan/host/{ip}` on domains automatically: that
 // would consume two query credits per lookup. Instead we resolve the
@@ -69,10 +69,10 @@ export async function shodanHost(ip: string): Promise<SourceReport> {
       reportUrl: `https://www.shodan.io/host/${ip}`,
       durationMs: Date.now() - start,
       fields: [
-        { label: 'Open ports', value: ports.length ? ports.join(', ') : '—' },
+        { label: 'Open ports', value: ports.length ? ports.join(', ') : '' },
         {
           label: 'Vulns',
-          value: vulns.length ? vulns.slice(0, 8).join(', ') : '—',
+          value: vulns.length ? vulns.slice(0, 8).join(', ') : '',
           mono: true,
         },
         { label: 'Org', value: json.org ?? null },

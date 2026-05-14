@@ -148,7 +148,7 @@ export async function hunterDomain(domain: string): Promise<SourceReport> {
         { label: 'Accept-all', value: d.accept_all ? 'yes' : 'no' },
         {
           label: 'Top emails',
-          value: top.length ? top.join(' · ') : '—',
+          value: top.length ? top.join(' · ') : '',
           mono: true,
         },
       ],

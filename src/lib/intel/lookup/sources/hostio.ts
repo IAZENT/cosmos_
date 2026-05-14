@@ -1,4 +1,4 @@
-// host.io connector — domain intel: DNS, web, related domains.
+// host.io connector  domain intel: DNS, web, related domains.
 // Endpoint: GET https://host.io/api/full/{domain}?token=...
 
 import type { SourceReport } from '../types'
@@ -78,27 +78,27 @@ export async function hostIoFull(domain: string): Promise<SourceReport> {
         { label: 'Web rank', value: web.rank ?? null },
         {
           label: 'A records',
-          value: (dns.a ?? []).slice(0, 4).join(', ') || '—',
+          value: (dns.a ?? []).slice(0, 4).join(', ') || '',
           mono: true,
         },
         {
           label: 'AAAA',
-          value: (dns.aaaa ?? []).slice(0, 2).join(', ') || '—',
+          value: (dns.aaaa ?? []).slice(0, 2).join(', ') || '',
           mono: true,
         },
         {
           label: 'MX',
-          value: (dns.mx ?? []).slice(0, 4).join(', ') || '—',
+          value: (dns.mx ?? []).slice(0, 4).join(', ') || '',
           mono: true,
         },
         {
           label: 'NS',
-          value: (dns.ns ?? []).slice(0, 4).join(', ') || '—',
+          value: (dns.ns ?? []).slice(0, 4).join(', ') || '',
           mono: true,
         },
         {
           label: 'TXT',
-          value: (dns.txt ?? []).slice(0, 2).join(' · ') || '—',
+          value: (dns.txt ?? []).slice(0, 2).join(' · ') || '',
         },
         {
           label: 'Backlinks',

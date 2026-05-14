@@ -8,9 +8,11 @@ import {
   ArrowRight,
   FileText,
   GraduationCap,
+  Library,
   Newspaper,
   Search,
   ShieldAlert,
+  Swords,
   Wrench,
 } from 'lucide-react'
 import type { SearchHit, SearchResponse } from '@/app/api/search/route'
@@ -27,6 +29,8 @@ const KIND_LABEL: Record<SearchHit['kind'], string> = {
   cve: 'cves',
   research: 'research',
   scholarship: 'scholarships',
+  arsenal: 'arsenal',
+  resource: 'resources',
 }
 
 function kindIcon(kind: SearchHit['kind']) {
@@ -40,6 +44,10 @@ function kindIcon(kind: SearchHit['kind']) {
       return <GraduationCap size={14} className={cls} aria-hidden />
     case 'tool':
       return <Wrench size={14} className={cls} aria-hidden />
+    case 'arsenal':
+      return <Swords size={14} className={cls} aria-hidden />
+    case 'resource':
+      return <Library size={14} className={cls} aria-hidden />
     case 'page':
     default:
       return <Newspaper size={14} className={cls} aria-hidden />
@@ -122,14 +130,15 @@ export function CommandPalette({
   })
 
   const grouped = useMemo(() => {
-    const out: Record<SearchHit['kind'], SearchHit[]> = {
-      cve: [],
-      research: [],
-      scholarship: [],
-      tool: [],
-      page: [],
+    // Defensive: build buckets lazily so an unexpected `kind` from a
+    // stale SWR cache or a future server change can never crash the
+    // palette. Unknown kinds bucket into 'page' so the user still sees
+    // the hit.
+    const out: Partial<Record<SearchHit['kind'], SearchHit[]>> = {}
+    for (const hit of data?.hits ?? []) {
+      const key: SearchHit['kind'] = hit.kind in KIND_LABEL ? hit.kind : 'page'
+      ;(out[key] ??= []).push(hit)
     }
-    for (const hit of data?.hits ?? []) out[hit.kind].push(hit)
     return out
   }, [data])
 
@@ -147,7 +156,9 @@ export function CommandPalette({
 
   const order: SearchHit['kind'][] = [
     'cve',
+    'arsenal',
     'research',
+    'resource',
     'scholarship',
     'tool',
     'page',
@@ -175,7 +186,7 @@ export function CommandPalette({
               autoFocus
               value={input}
               onValueChange={setInput}
-              placeholder="Search CVEs, research, scholarships, tools…"
+              placeholder="Search CVEs, arsenal, research, resources, scholarships, tools…"
               className="h-12 w-full bg-transparent text-[14px] text-[var(--cosmos-text)] outline-none placeholder:text-[var(--cosmos-text-dim)]"
             />
             <kbd className="hidden shrink-0 rounded border border-[var(--cosmos-border)] bg-[var(--cosmos-bg-subtle)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--cosmos-text-muted)] sm:inline-flex">
@@ -189,8 +200,8 @@ export function CommandPalette({
             </Command.Empty>
 
             {order.map((kind) => {
-              const items = grouped[kind]
-              if (!items || items.length === 0) return null
+              const items = grouped[kind] ?? []
+              if (items.length === 0) return null
               return (
                 <Command.Group
                   key={kind}

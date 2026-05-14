@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
@@ -7,6 +8,7 @@ import { Navbar } from '@/components/layout/Navbar'
 import { Footer } from '@/components/layout/Footer'
 import { SectionLabel } from '@/components/ui/SectionLabel'
 import { Markdown } from '@/components/research/Markdown'
+import { SearchHighlight } from '@/components/research/SearchHighlight'
 import { getResearchBySlug } from '@/lib/content/server-data'
 import { formatUTC } from '@/lib/utils/date'
 
@@ -94,7 +96,10 @@ export default async function ResearchDetailPage({
               ) : null}
             </div>
 
-            <div className="mt-10 border-t border-[var(--cosmos-border-dim)] pt-8">
+            <div
+              data-search-target
+              className="mt-10 border-t border-[var(--cosmos-border-dim)] pt-8"
+            >
               {post.content ? (
                 <Markdown source={post.content} />
               ) : (
@@ -103,6 +108,12 @@ export default async function ResearchDetailPage({
                 </p>
               )}
             </div>
+            {/* Reads `?highlight=<q>` (set by the Cmd+K palette when a
+                match was found inside the article body) and scrolls /
+                marks the first occurrence. */}
+            <Suspense fallback={null}>
+              <SearchHighlight />
+            </Suspense>
           </div>
         </article>
       </main>

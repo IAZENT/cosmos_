@@ -10,9 +10,11 @@ const NAV_LINKS: { label: string; href: string }[] = [
   { label: 'Intelligence', href: '/intelligence' },
   { label: 'News', href: '/news' },
   { label: 'Scholarships', href: '/scholarships' },
-  { label: 'Research', href: '/research' },
+  { label: 'Writings', href: '/research' },
   { label: 'Resources', href: '/resources' },
+  { label: 'Arsenal', href: '/arsenal' },
   { label: 'Tools', href: '/tools' },
+  { label: 'About', href: '/about' },
 ]
 
 function LiveIndicator() {

@@ -263,8 +263,8 @@ function Field({
         {label}
       </dt>
       <dd className="flex items-center gap-1 font-mono text-[12px] text-[var(--cosmos-text)]">
-        <span className="truncate" title={value || '—'}>
-          {value || '—'}
+        <span className="truncate" title={value || ''}>
+          {value || ''}
         </span>
         {copy && value ? <CopyButton value={value} /> : null}
       </dd>

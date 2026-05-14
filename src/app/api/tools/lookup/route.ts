@@ -3,7 +3,7 @@
 // a normalized `LookupResponse`.
 //
 // All upstream API keys live server-side in env. The response never
-// leaks them. We don't cache here — every call is a fresh fan-out.
+// leaks them. We don't cache here  every call is a fresh fan-out.
 
 import { NextResponse } from 'next/server'
 import { z } from 'zod'

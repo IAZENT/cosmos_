@@ -3,6 +3,7 @@ import {
   BookOpen,
   Network,
   Shield,
+  Swords,
   Wrench,
   type LucideIcon,
 } from 'lucide-react'
@@ -27,7 +28,7 @@ const MODULES: ModuleDef[] = [
   },
   {
     num: '02',
-    title: 'Research',
+    title: 'Writings',
     href: '/research',
     Icon: BookOpen,
     blurb:
@@ -35,15 +36,23 @@ const MODULES: ModuleDef[] = [
   },
   {
     num: '03',
-    title: 'Resource Network',
+    title: 'Arsenal',
+    href: '/arsenal',
+    Icon: Swords,
+    blurb:
+      'Searchable operator knowledge base of commands, payloads, and playbooks with MITRE ATT&CK tagging.',
+  },
+  {
+    num: '04',
+    title: 'Resources',
     href: '/resources',
     Icon: Network,
     blurb:
       'Curated tooling, learning paths, and reference material for practitioners.',
   },
   {
-    num: '04',
-    title: 'Tooling',
+    num: '05',
+    title: 'Tools',
     href: '/tools',
     Icon: Wrench,
     blurb:

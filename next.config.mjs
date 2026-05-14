@@ -56,14 +56,21 @@ const nextConfig = {
     imageSizes: [16, 24, 32, 48, 64, 96, 128, 256],
   },
   async headers() {
-    return [
+    const headers = [
       {
         source: '/:path*',
         headers: securityHeaders,
       },
-      // Aggressively cache hashed static assets  Next already
-      // fingerprints filenames, so a 1-year immutable header is safe.
-      {
+    ]
+    // Aggressively cache hashed static assets ONLY in production. In
+    // dev, Turbopack reuses chunk URLs across rebuilds, so an
+    // `immutable` header makes the browser keep serving stale chunks
+    // even after the server is restarted  leading to phantom
+    // hydration mismatches and "x is undefined" errors that no source
+    // change can fix without a hard reload. Production filenames are
+    // fingerprinted, so the header is safe there.
+    if (process.env.NODE_ENV === 'production') {
+      headers.push({
         source: '/_next/static/:path*',
         headers: [
           {
@@ -71,8 +78,9 @@ const nextConfig = {
             value: 'public, max-age=31536000, immutable',
           },
         ],
-      },
-    ]
+      })
+    }
+    return headers
   },
 }
 

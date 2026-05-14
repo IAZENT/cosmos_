@@ -5,9 +5,10 @@ import { getIntelStatsLive } from '@/lib/intel/server-data'
 
 const MODULES: { num: string; label: string; href: string }[] = [
   { num: '01', label: 'Intelligence', href: '/intelligence' },
-  { num: '02', label: 'Research', href: '/research' },
-  { num: '03', label: 'Tools', href: '/tools' },
+  { num: '02', label: 'Writings', href: '/research' },
+  { num: '03', label: 'Arsenal', href: '/arsenal' },
   { num: '04', label: 'Resources', href: '/resources' },
+  { num: '05', label: 'Tools', href: '/tools' },
 ]
 
 export async function HeroSection() {

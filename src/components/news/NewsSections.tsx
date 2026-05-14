@@ -19,7 +19,7 @@ const SECTIONS: SectionConfig[] = [
       'The Hacker News · BleepingComputer · Krebs · Dark Reading',
     Icon: ExternalLink,
     emptyMessage:
-      'No feeds reachable right now — every upstream returned empty or timed out.',
+      'No feeds reachable right now  every upstream returned empty or timed out.',
   },
   {
     key: 'nepal',
@@ -50,14 +50,55 @@ const SECTIONS: SectionConfig[] = [
 export function NewsSections({ bundle }: { bundle: NewsBundle }) {
   return (
     <div className="mt-10 flex flex-col gap-16">
+      {/* Sticky category jump-nav. Sits below the main Navbar (h-14 = 56px)
+       * and below the IntelStatusBar; offset lets each anchor scroll to a
+       * comfortable position. Smooth scrolling is enabled site-wide in
+       * globals.css. */}
+      <nav
+        aria-label="News categories"
+        className="sticky top-14 z-30 -mx-4 border-y border-[var(--cosmos-border-dim)] bg-[var(--cosmos-bg)]/90 px-4 backdrop-blur sm:-mx-6 sm:px-6 md:-mx-12 md:px-12"
+      >
+        <ul className="cosmos-scroll-x flex items-center gap-1.5 py-2 whitespace-nowrap">
+          {SECTIONS.map((s) => {
+            const count = bundle[s.key].length
+            return (
+              <li key={s.key}>
+                <a
+                  href={`#news-${s.key}`}
+                  className="inline-flex items-center gap-2 rounded-[4px] border border-[var(--cosmos-border)] px-3 py-1.5 font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--cosmos-text-muted)] transition-colors hover:border-[var(--cosmos-text-dim)] hover:text-[var(--cosmos-text)]"
+                >
+                  <s.Icon
+                    size={12}
+                    aria-hidden
+                    className="text-[var(--cosmos-accent)]"
+                  />
+                  <span>{s.title}</span>
+                  <span className="font-mono text-[10px] tabular-nums text-[var(--cosmos-text-dim)]">
+                    {count}
+                  </span>
+                </a>
+              </li>
+            )
+          })}
+        </ul>
+      </nav>
+
       {SECTIONS.map((s) => {
         const items = bundle[s.key]
         return (
-          <section key={s.key} aria-labelledby={`news-${s.key}`}>
+          <section
+            key={s.key}
+            id={`news-${s.key}`}
+            aria-labelledby={`news-${s.key}-h`}
+            // scroll-margin-top accounts for the sticky navbar + the
+            // sticky category nav above so the heading isn't hidden
+            // when the user clicks a chip.
+            className="scroll-mt-[140px]"
+          >
             <header className="flex flex-wrap items-baseline justify-between gap-3 border-b border-[var(--cosmos-border-dim)] pb-3">
               <div>
                 <h2
-                  id={`news-${s.key}`}
+                  id={`news-${s.key}-h`}
                   className="flex items-center gap-2 font-sans text-[22px] font-semibold tracking-[-0.01em] text-[var(--cosmos-text)]"
                 >
                   <s.Icon

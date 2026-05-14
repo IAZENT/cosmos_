@@ -59,6 +59,12 @@ export default async function ProtectedAdminLayout({
                 Resources
               </Link>
               <Link
+                href="/user2admin/arsenal"
+                className="font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--cosmos-text-muted)] hover:text-[var(--cosmos-text)]"
+              >
+                Arsenal
+              </Link>
+              <Link
                 href="/user2admin/session"
                 className="font-mono text-[11px] uppercase tracking-[0.08em] text-[var(--cosmos-text-muted)] hover:text-[var(--cosmos-text)]"
               >

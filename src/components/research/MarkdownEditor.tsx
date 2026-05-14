@@ -87,7 +87,7 @@ export function MarkdownEditor({
   // and replace the pasted content with the converted text.
   const handlePaste = async (e: ClipboardEvent<HTMLTextAreaElement>) => {
     const html = e.clipboardData.getData('text/html')
-    if (!html || !/<\w+/.test(html)) return // plain text — let default paste happen
+    if (!html || !/<\w+/.test(html)) return // plain text  let default paste happen
     e.preventDefault()
     setError(null)
     setImporting(true)
@@ -154,7 +154,7 @@ export function MarkdownEditor({
           Include images (PDF / DOCX)
         </label>
         <span className="font-mono text-[10px] text-[var(--cosmos-text-dim)]">
-          Paste from Word / Google Docs — auto-converted to Markdown.
+          Paste from Word / Google Docs  auto-converted to Markdown.
         </span>
       </div>
 

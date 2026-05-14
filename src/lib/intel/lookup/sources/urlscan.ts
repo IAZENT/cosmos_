@@ -1,4 +1,4 @@
-// urlscan.io connector — search the public corpus for prior scans of
+// urlscan.io connector  search the public corpus for prior scans of
 // the queried URL or domain. Fast, no submit. The "Submit fresh scan"
 // flow is exposed as an inline action on the result card and uses the
 // existing /api/tools/urlscan route.
@@ -33,7 +33,7 @@ type UrlscanSearchResponse = {
 const base = { source: 'urlscan' as const, label: 'urlscan.io' }
 
 function escapeForQuery(value: string): string {
-  // urlscan's Lucene-style query DSL — escape quotes and backslashes.
+  // urlscan's Lucene-style query DSL  escape quotes and backslashes.
   return value.replace(/\\/g, '\\\\').replace(/"/g, '\\"')
 }
 

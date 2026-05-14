@@ -1,4 +1,4 @@
-// AbuseIPDB v2 connector — IP-only.
+// AbuseIPDB v2 connector  IP-only.
 // Endpoint: GET https://api.abuseipdb.com/api/v2/check?ipAddress=...
 
 import type { SourceReport, Verdict } from '../types'
@@ -71,7 +71,7 @@ export async function abuseIpdbCheck(ip: string): Promise<SourceReport> {
       status: 'ok',
       verdict: verdictFromConfidence(confidence),
       score: clamp(confidence, 0, 100),
-      summary: `Abuse confidence ${confidence}% — ${d.totalReports ?? 0} reports from ${d.numDistinctUsers ?? 0} distinct reporters.`,
+      summary: `Abuse confidence ${confidence}%  ${d.totalReports ?? 0} reports from ${d.numDistinctUsers ?? 0} distinct reporters.`,
       reportUrl: `https://www.abuseipdb.com/check/${ip}`,
       durationMs: Date.now() - start,
       fields: [

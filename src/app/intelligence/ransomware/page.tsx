@@ -104,7 +104,7 @@ export default async function RansomwarePage() {
                     <p className="mt-3 text-[12px] font-mono uppercase tracking-[0.1em] text-[var(--cosmos-text-dim)]">
                       {[row.vendorProject, row.product]
                         .filter(Boolean)
-                        .join(' · ') || '—'}
+                        .join(' · ') || ''}
                     </p>
                     {row.vulnerabilityName ? (
                       <p className="mt-1 text-[14px] text-[var(--cosmos-text)]">
@@ -179,7 +179,7 @@ function Stat({
       <p
         className={`mt-2 text-[var(--cosmos-text)] ${small ? 'truncate text-[16px]' : 'text-[28px]'} leading-none`}
       >
-        {typeof value === 'number' ? value.toLocaleString('en-US') : (value || '—')}
+        {typeof value === 'number' ? value.toLocaleString('en-US') : (value || '')}
       </p>
     </div>
   )

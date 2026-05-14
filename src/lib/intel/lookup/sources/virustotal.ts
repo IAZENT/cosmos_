@@ -85,7 +85,7 @@ async function callVt(path: string): Promise<VtResponse | null> {
   const res = await fetchWithTimeout(`https://www.virustotal.com/api/v3${path}`, {
     headers: { 'x-apikey': key, accept: 'application/json' },
   })
-  // 404 = "not seen by VT" — perfectly normal, return empty data.
+  // 404 = "not seen by VT"  perfectly normal, return empty data.
   if (res.status === 404) return {}
   if (!res.ok) {
     const body = (await res.json().catch(() => null)) as VtResponse | null

@@ -12,6 +12,7 @@ const STATIC_ROUTES = [
   '/research',
   '/resources',
   '/resources/submit',
+  '/arsenal',
   '/tools',
   '/tools/base64',
   '/tools/url',

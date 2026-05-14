@@ -14,6 +14,8 @@ export type SearchKind =
   | 'cve'
   | 'research'
   | 'scholarship'
+  | 'arsenal'
+  | 'resource'
   | 'page'
   | 'tool'
 
@@ -74,14 +76,29 @@ const STATIC_HITS: SearchHit[] = [
   {
     kind: 'page',
     id: 'p:research',
-    title: 'Research',
+    title: 'Writings',
+    subtitle: 'Notes, writeups, and analysis',
     href: '/research',
+  },
+  {
+    kind: 'page',
+    id: 'p:about',
+    title: 'About',
+    subtitle: 'Operator profile',
+    href: '/about',
   },
   {
     kind: 'page',
     id: 'p:resources',
     title: 'Resources',
     href: '/resources',
+  },
+  {
+    kind: 'page',
+    id: 'p:arsenal',
+    title: 'Arsenal',
+    subtitle: 'Operator commands & playbooks',
+    href: '/arsenal',
   },
   { kind: 'tool', id: 't:tools', title: 'Tools index', href: '/tools' },
   { kind: 'tool', id: 't:jwt', title: 'JWT decoder', href: '/tools/jwt' },
@@ -143,26 +160,54 @@ export async function GET(request: Request) {
 
   try {
     const supabase = await createServerSupabaseClient()
-    const [cveRes, researchRes, scholarshipRes] = await Promise.all([
-      supabase
-        .from('cve_cache')
-        .select('cve_id, cvss_severity, description')
-        .or(`cve_id.ilike.%${safe}%,description.ilike.%${safe}%`)
-        .order('published_at', { ascending: false, nullsFirst: false })
-        .limit(limit),
-      supabase
-        .from('research_posts')
-        .select('slug, title, summary')
-        .eq('published', true)
-        .or(`title.ilike.%${safe}%,summary.ilike.%${safe}%`)
-        .limit(limit),
-      supabase
-        .from('scholarship_news')
-        .select('id, title, source')
-        .or(`title.ilike.%${safe}%,summary.ilike.%${safe}%`)
-        .order('published_at', { ascending: false, nullsFirst: false })
-        .limit(limit),
-    ])
+    const [cveRes, researchRes, scholarshipRes, arsenalRes, resourceRes] =
+      await Promise.all([
+        supabase
+          .from('cve_cache')
+          .select('cve_id, cvss_severity, description')
+          .or(`cve_id.ilike.%${safe}%,description.ilike.%${safe}%`)
+          .order('published_at', { ascending: false, nullsFirst: false })
+          .limit(limit),
+        // Research: search title + summary + body content so that
+        // typing a phrase that only appears mid-article still surfaces
+        // the post. Body matches will be deep-linked with
+        // `?highlight=<q>` so the detail page scrolls to and marks the
+        // first occurrence.
+        supabase
+          .from('research_posts')
+          .select('slug, title, summary, content')
+          .eq('published', true)
+          .or(
+            `title.ilike.%${safe}%,summary.ilike.%${safe}%,content.ilike.%${safe}%`,
+          )
+          .limit(limit),
+        supabase
+          .from('scholarship_news')
+          .select('id, title, source')
+          .or(`title.ilike.%${safe}%,summary.ilike.%${safe}%`)
+          .order('published_at', { ascending: false, nullsFirst: false })
+          .limit(limit),
+        // Arsenal: search title / description / command / mitre id so that
+        // typing e.g. "nmap", "T1046", or "subdomain" surfaces the right
+        // playbook entry. Only published rows are returned (RLS would
+        // enforce this anyway, but we belt-and-brace it here).
+        supabase
+          .from('arsenal_entries')
+          .select('id, title, description, category, difficulty')
+          .eq('published', true)
+          .or(
+            `title.ilike.%${safe}%,description.ilike.%${safe}%,command.ilike.%${safe}%,mitre_id.ilike.%${safe}%`,
+          )
+          .order('pinned', { ascending: false })
+          .order('usage_count', { ascending: false })
+          .limit(limit),
+        supabase
+          .from('resources')
+          .select('id, title, summary, category, url')
+          .eq('published', true)
+          .or(`title.ilike.%${safe}%,summary.ilike.%${safe}%`)
+          .limit(limit),
+      ])
 
     for (const row of cveRes.data ?? []) {
       const cveId = row.cve_id as string
@@ -181,12 +226,38 @@ export async function GET(request: Request) {
 
     for (const row of researchRes.data ?? []) {
       const slug = row.slug as string
+      const title = (row.title as string) ?? slug
+      const summary = (row.summary as string | null) ?? null
+      const content = (row.content as string | null) ?? null
+      // Detect body-only match: the query doesn't appear in title or
+      // summary but does appear in content. If so, attach the
+      // `?highlight=` deep-link AND surface a 80-char excerpt around
+      // the first occurrence so the palette previews the match.
+      const lq = q.toLowerCase()
+      const inHeader =
+        title.toLowerCase().includes(lq) ||
+        (summary ?? '').toLowerCase().includes(lq)
+      let subtitle: string | null = summary
+      let href = `/research/${slug}`
+      if (!inHeader && content) {
+        const idx = content.toLowerCase().indexOf(lq)
+        if (idx >= 0) {
+          const start = Math.max(0, idx - 30)
+          const end = Math.min(content.length, idx + lq.length + 50)
+          const snippet =
+            (start > 0 ? '…' : '') +
+            content.slice(start, end).replace(/\s+/g, ' ').trim() +
+            (end < content.length ? '…' : '')
+          subtitle = snippet
+          href = `/research/${slug}?highlight=${encodeURIComponent(q)}`
+        }
+      }
       hits.push({
         kind: 'research',
         id: `research:${slug}`,
-        title: (row.title as string) ?? slug,
-        subtitle: (row.summary as string | null) ?? null,
-        href: `/research/${slug}`,
+        title,
+        subtitle,
+        href,
       })
     }
 
@@ -198,6 +269,37 @@ export async function GET(request: Request) {
         title: (row.title as string) ?? '(untitled)',
         subtitle: (row.source as string | null) ?? null,
         href: '/scholarships',
+      })
+    }
+
+    for (const row of arsenalRes.data ?? []) {
+      const id = row.id as string
+      const cat = (row.category as string | null) ?? null
+      const diff = (row.difficulty as string | null) ?? null
+      hits.push({
+        kind: 'arsenal',
+        id: `arsenal:${id}`,
+        title: (row.title as string) ?? '(untitled)',
+        subtitle:
+          [cat, diff, ((row.description as string | null) ?? '').slice(0, 60)]
+            .filter(Boolean)
+            .join(' · ') || null,
+        // Deep-link the /arsenal page with a query that pre-fills the
+        // search input so the user lands directly on this entry.
+        href: `/arsenal?q=${encodeURIComponent((row.title as string) ?? '')}`,
+      })
+    }
+
+    for (const row of resourceRes.data ?? []) {
+      const id = row.id as string
+      hits.push({
+        kind: 'resource',
+        id: `resource:${id}`,
+        title: (row.title as string) ?? '(untitled)',
+        subtitle:
+          ((row.category as string | null) ?? null) ??
+          ((row.summary as string | null) ?? null),
+        href: '/resources',
       })
     }
   } catch {

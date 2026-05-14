@@ -33,6 +33,10 @@ html {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Smooth in-page anchor + back-to-top scrolling. The reduced-motion
+   * media query at the bottom of this file resets to `auto` for users
+   * who have opted out. */
+  scroll-behavior: smooth;
 }
 
 body {
@@ -279,4 +283,96 @@ select {
 .cosmos-markdown li {
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+/* -----------------------------------------------------------------
+ * Cursor effect overlay. Two fixed elements positioned via
+ * `transform: translate3d()` from a requestAnimationFrame loop in
+ * `<CursorEffect />`. Both have `pointer-events: none` so they never
+ * eat clicks or selection. Disabled on touch / reduced-motion at the
+ * component level  CSS here only defines visuals.
+ * -----------------------------------------------------------------
+ */
+.cosmos-cursor-ring,
+.cosmos-cursor-dot {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform, opacity;
+  transition:
+    opacity 200ms ease,
+    background-color 150ms ease,
+    border-color 150ms ease;
+}
+.cosmos-cursor-ring {
+  width: 28px;
+  height: 28px;
+  border: 1px solid var(--cosmos-text-muted);
+  border-radius: 9999px;
+  mix-blend-mode: difference;
+}
+.cosmos-cursor-ring--hover {
+  border-color: var(--cosmos-accent);
+  background: color-mix(in srgb, var(--cosmos-accent) 12%, transparent);
+}
+.cosmos-cursor-ring--down {
+  border-color: var(--cosmos-accent);
+  background: color-mix(in srgb, var(--cosmos-accent) 24%, transparent);
+}
+.cosmos-cursor-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 9999px;
+  background: var(--cosmos-accent);
+  mix-blend-mode: difference;
+}
+
+/* -----------------------------------------------------------------
+ * Footer multi-column list. column-* properties are inlined on the
+ * <ul>, but this rule guarantees list items render correctly as
+ * inline-blocks across columns (some browsers default <li> to
+ * display: list-item which can break inside a CSS column).
+ * -----------------------------------------------------------------
+ */
+.cosmos-footer-cols {
+  list-style: none;
+}
+.cosmos-footer-cols > li {
+  display: block;
+  break-inside: avoid;
+  page-break-inside: avoid;
+}
+
+/* -----------------------------------------------------------------
+ * Search highlight ("pinpoint") used by <SearchHighlight />. When the
+ * user clicks a research result from the Cmd+K palette that matched a
+ * phrase mid-article, the page scrolls to the first occurrence and we
+ * wrap it in <mark.cosmos-search-mark> so it stands out for ~6 s.
+ * -----------------------------------------------------------------
+ */
+.cosmos-search-mark {
+  background: var(--cosmos-accent-dim);
+  color: var(--cosmos-accent);
+  padding: 1px 4px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 1px var(--cosmos-accent-dim);
+  transition: background-color 600ms ease, color 600ms ease, box-shadow 600ms ease;
+}
+.cosmos-search-mark--pulse {
+  animation: cosmos-search-pulse 1.4s ease-out 2;
+}
+.cosmos-search-mark--fade {
+  background: transparent;
+  color: inherit;
+  box-shadow: none;
+}
+@keyframes cosmos-search-pulse {
+  0% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--cosmos-accent) 60%, transparent);
+  }
+  100% {
+    box-shadow: 0 0 0 12px color-mix(in srgb, var(--cosmos-accent) 0%, transparent);
+  }
 }

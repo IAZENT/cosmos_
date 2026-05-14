@@ -214,12 +214,28 @@ export async function runKevSync(): Promise<SyncRunOutcome> {
 
   try {
     const payload = await fetchCISAKev()
+    // CISA encodes the ransomware flag as a free-form text column:
+    // "Known", "Unknown", or sometimes empty. Treat anything starting
+    // with "k" (case-insensitive) as a positive signal so future tweaks
+    // to the wording ("Known to be used") still count.
+    const isRansomware = (raw: string | undefined): boolean =>
+      typeof raw === 'string' && /^k/i.test(raw.trim())
+    const parseDueDate = (raw: string | undefined): string | null => {
+      if (!raw) return null
+      const d = new Date(raw)
+      return Number.isNaN(d.getTime()) ? null : d.toISOString()
+    }
     const rows = payload.vulnerabilities.map((item) => ({
       cve_id: item.cveID,
       description: item.shortDescription ?? null,
       is_kev: true,
       kev_added_at: item.dateAdded ?? null,
       kev_action: item.requiredAction ?? null,
+      kev_ransomware: isRansomware(item.knownRansomwareCampaignUse),
+      kev_vendor_project: item.vendorProject ?? null,
+      kev_product: item.product ?? null,
+      kev_vulnerability_name: item.vulnerabilityName ?? null,
+      kev_due_date: parseDueDate(item.dueDate),
       synced_at: new Date().toISOString(),
     }))
 
@@ -230,13 +246,27 @@ export async function runKevSync(): Promise<SyncRunOutcome> {
     if (upsertErr) errors.push(upsertErr.message)
     else synced = rows.length
 
-    const { count } = await supabase
-      .from('cve_cache')
-      .select('*', { count: 'exact', head: true })
-      .eq('is_kev', true)
+    const [{ count: kevCount }, { count: ransomwareCount }] = await Promise.all(
+      [
+        supabase
+          .from('cve_cache')
+          .select('*', { count: 'exact', head: true })
+          .eq('is_kev', true),
+        supabase
+          .from('cve_cache')
+          .select('*', { count: 'exact', head: true })
+          .eq('kev_ransomware', true),
+      ],
+    )
 
     await supabase.from('intel_stats').upsert(
-      [{ stat_key: 'kev_total', stat_value: count ?? rows.length }],
+      [
+        { stat_key: 'kev_total', stat_value: kevCount ?? rows.length },
+        {
+          stat_key: 'ransomware_kev_total',
+          stat_value: ransomwareCount ?? 0,
+        },
+      ],
       { onConflict: 'stat_key' },
     )
   } catch (err) {

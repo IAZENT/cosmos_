@@ -6,11 +6,13 @@ import {
   type IntelStatKey,
 } from '@/types/intel'
 import type { Severity } from '@/lib/utils/severity'
-import type {
-  KevHighlight,
-  PreviewCVE,
-  SeverityBreakdown,
-  TickerCVE,
+import {
+  EMPTY_VELOCITY,
+  type KevHighlight,
+  type PreviewCVE,
+  type SeverityBreakdown,
+  type ThreatVelocity,
+  type TickerCVE,
 } from '@/lib/intel/server-data-types'
 import {
   getLastSyncedAtDirect,
@@ -21,7 +23,14 @@ import {
   fetchKevLookupDirect,
 } from '@/lib/intel/direct'
 
-export type { PreviewCVE, TickerCVE, KevHighlight, SeverityBreakdown }
+export {
+  EMPTY_VELOCITY,
+  type PreviewCVE,
+  type TickerCVE,
+  type KevHighlight,
+  type SeverityBreakdown,
+  type ThreatVelocity,
+}
 
 function supabaseConfigured(): boolean {
   return Boolean(
@@ -190,6 +199,54 @@ export const getLastSyncedAtServer = cache(async function getLastSyncedAtServerI
     return (data?.synced_at as string | null) ?? null
   } catch {
     return null
+  }
+})
+
+/**
+ * Compute the current CVE publish-rate vs. the trailing 7-day baseline.
+ * Two cheap `count: 'exact', head: true` queries on the indexed
+ * `published_at` column  no row data transferred.
+ */
+export const getThreatVelocityServer = cache(async function getThreatVelocityServerImpl(): Promise<ThreatVelocity> {
+  if (!supabaseConfigured()) {
+    return { ...EMPTY_VELOCITY, computedAt: new Date().toISOString() }
+  }
+  try {
+    const supabase = await createServerSupabaseClient()
+    const now = Date.now()
+    const oneHourAgo = new Date(now - 60 * 60 * 1000).toISOString()
+    const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString()
+
+    const [{ count: lastHour }, { count: lastWeek }] = await Promise.all([
+      supabase
+        .from('cve_cache')
+        .select('*', { count: 'exact', head: true })
+        .gte('published_at', oneHourAgo),
+      supabase
+        .from('cve_cache')
+        .select('*', { count: 'exact', head: true })
+        .gte('published_at', sevenDaysAgo),
+    ])
+
+    const ratePerHour = lastHour ?? 0
+    const baseline7dPerHour = (lastWeek ?? 0) / (7 * 24)
+    const deltaPct =
+      baseline7dPerHour > 0
+        ? ((ratePerHour - baseline7dPerHour) / baseline7dPerHour) * 100
+        : 0
+    // "Elevated" requires both a sizeable absolute increase (>= 3 CVEs/hr) and
+    // a >50% relative jump  filters out noisy late-night windows where a
+    // single extra publish doubles the rate from 1 to 2.
+    const elevated = ratePerHour >= 3 && deltaPct >= 50
+    return {
+      ratePerHour,
+      baseline7dPerHour: Math.round(baseline7dPerHour * 10) / 10,
+      deltaPct: Math.round(deltaPct),
+      elevated,
+      computedAt: new Date().toISOString(),
+    }
+  } catch {
+    return { ...EMPTY_VELOCITY, computedAt: new Date().toISOString() }
   }
 })
 

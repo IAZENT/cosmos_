@@ -54,6 +54,17 @@ export default function IntelligencePage() {
               Exploited Vulnerabilities catalog. Filter by severity, KEV
               status, or date range  click any CVE for the full record.
             </p>
+            <div className="mt-6 flex flex-wrap gap-2">
+              <a
+                href="/intelligence/ransomware"
+                className="cosmos-btn-ghost"
+              >
+                ransomware tracker
+              </a>
+              <a href="/feed.xml" className="cosmos-btn-ghost">
+                atom feed
+              </a>
+            </div>
           </div>
         </section>
 

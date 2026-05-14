@@ -2,8 +2,8 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Menu, X } from 'lucide-react'
-import { useState } from 'react'
+import { Menu, Search, X } from 'lucide-react'
+import { useState, useSyncExternalStore } from 'react'
 import { cn } from '@/lib/utils/cn'
 
 const NAV_LINKS: { label: string; href: string }[] = [
@@ -26,6 +26,42 @@ function LiveIndicator() {
         LIVE
       </span>
     </span>
+  )
+}
+
+function dispatchOpenPalette() {
+  // The palette listens for Cmd+K globally; synthesise the same event so
+  // a click on the navbar trigger opens it without coupling components
+  // through React context.
+  const evt = new KeyboardEvent('keydown', {
+    key: 'k',
+    metaKey: true,
+    bubbles: true,
+  })
+  window.dispatchEvent(evt)
+}
+
+function PaletteTrigger() {
+  // Detect platform via useSyncExternalStore: SSR returns false (no window),
+  // first client render reads the real value with no extra effect.
+  const isMac = useSyncExternalStore(
+    () => () => {},
+    () => /Mac|iPhone|iPad/.test(navigator.platform),
+    () => false,
+  )
+  return (
+    <button
+      type="button"
+      onClick={dispatchOpenPalette}
+      aria-label="Open command palette"
+      className="hidden items-center gap-2 rounded-[4px] border border-[var(--cosmos-border)] bg-[var(--cosmos-bg-elevated)] px-2.5 py-1 font-mono text-[11px] text-[var(--cosmos-text-muted)] transition-colors hover:border-[var(--cosmos-text-dim)] hover:text-[var(--cosmos-text)] sm:inline-flex"
+    >
+      <Search size={12} aria-hidden />
+      <span>search</span>
+      <kbd className="rounded border border-[var(--cosmos-border)] bg-[var(--cosmos-bg-subtle)] px-1 text-[10px] text-[var(--cosmos-text-dim)]">
+        {isMac ? 'K' : 'CTRL+K'}
+      </kbd>
+    </button>
   )
 }
 
@@ -67,7 +103,8 @@ export function Navbar() {
           })}
         </nav>
 
-        <div className="hidden md:block">
+        <div className="hidden items-center gap-3 md:flex">
+          <PaletteTrigger />
           <LiveIndicator />
         </div>
 

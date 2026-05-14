@@ -1,10 +1,13 @@
 import type { MetadataRoute } from 'next'
 import { listPublishedResearch } from '@/lib/content/server-data'
 import { listRecentCveIds } from '@/lib/intel/cve-detail'
+import { recentCompletedWeeks } from '@/lib/intel/digest'
 
 const STATIC_ROUTES = [
   '',
   '/intelligence',
+  '/intelligence/ransomware',
+  '/digest',
   '/scholarships',
   '/research',
   '/resources',
@@ -60,5 +63,20 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     /* sitemap should never throw  degrade silently */
   }
 
-  return [...staticEntries, ...researchEntries, ...cveEntries]
+  // Recent weekly digests  these are linkable, indexable content.
+  const digestEntries: MetadataRoute.Sitemap = recentCompletedWeeks(12).map(
+    (w) => ({
+      url: `${base}/digest/${w.slug}`,
+      lastModified: w.end,
+      changeFrequency: 'monthly',
+      priority: 0.6,
+    }),
+  )
+
+  return [
+    ...staticEntries,
+    ...researchEntries,
+    ...digestEntries,
+    ...cveEntries,
+  ]
 }

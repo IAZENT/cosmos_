@@ -2,11 +2,16 @@
 
 import useSWR from 'swr'
 import { NPTClock } from '@/components/home/NPTClock'
+import { ThreatVelocity } from '@/components/home/ThreatVelocity'
 import { formatRelative } from '@/lib/utils/date'
 import {
   EMPTY_STATS,
   type IntelStatsPayload,
 } from '@/types/intel'
+import {
+  EMPTY_VELOCITY,
+  type ThreatVelocity as ThreatVelocityData,
+} from '@/lib/intel/server-data-types'
 
 function Dot({ on }: { on: boolean }) {
   return (
@@ -55,8 +60,51 @@ export function IntelStatusBar() {
   const stats = data ?? FALLBACK
   const syncActive = Boolean(stats.last_synced_at)
 
+  // Probe velocity directly here so the parent bar can render the
+  // "// ELEVATED THREAT ACTIVITY" banner. The <ThreatVelocity /> child
+  // dedupes against this same SWR key.
+  const { data: velocity } = useSWR<ThreatVelocityData>(
+    '/api/intelligence/velocity',
+    async (url: string) => {
+      const res = await fetch(url)
+      if (!res.ok) throw new Error(`velocity ${res.status}`)
+      return (await res.json()) as ThreatVelocityData
+    },
+    {
+      fallbackData: EMPTY_VELOCITY,
+      refreshInterval: 60_000,
+      revalidateOnFocus: false,
+      revalidateIfStale: false,
+      dedupingInterval: 30_000,
+    },
+  )
+  const elevated = Boolean(velocity?.elevated)
+
   return (
     <div className="border-b border-[var(--cosmos-border-dim)] bg-[var(--cosmos-bg-elevated)]">
+      {elevated ? (
+        <div
+          role="status"
+          aria-live="polite"
+          className="border-b border-[var(--cosmos-critical)]/30 bg-[var(--cosmos-critical)]/10"
+        >
+          <div className="mx-auto flex h-7 max-w-cosmos items-center gap-2 px-4 sm:px-6 md:px-12">
+            <span
+              aria-hidden
+              className="relative flex h-2 w-2"
+            >
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--cosmos-critical)] opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--cosmos-critical)]" />
+            </span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-critical)]">
+              {'// elevated threat activity'}
+            </span>
+            <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-muted)]">
+              {velocity?.ratePerHour ?? 0} CVE/HR · +{velocity?.deltaPct ?? 0}% vs 7-day avg
+            </span>
+          </div>
+        </div>
+      ) : null}
       {/* On mobile the inner row needs to scroll horizontally to fit the
        * sync/kev/clock chips; we anchor the UTC clock with a `min-w-0`
        * outer flex so it never gets pushed off-screen. */}
@@ -76,6 +124,8 @@ export function IntelStatusBar() {
           <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-[var(--cosmos-text-muted)]">
             KEV: {stats.kev_total.toLocaleString('en-US')} ENTRIES
           </span>
+          <Sep />
+          <ThreatVelocity />
           <span className="hidden md:inline">
             <Sep />
           </span>
